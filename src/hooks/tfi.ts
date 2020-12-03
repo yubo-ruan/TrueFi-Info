@@ -24,12 +24,15 @@ export const getPoolJoined = async () => {
         toBlock: "latest"
       }
     let result = []
+    let totalDeposited = 0
     const res = await provider.getLogs(logInfo)
     for(let i=0;i<res.length;i++){
         const deposited = parseInt(res[i]['data'].substr(0,66),16)/1e18
         const minted = parseInt(res[i]['data'].substr(67,129),16)/1e18
         const blockNumber = res[i]['blockNumber']
+        totalDeposited += deposited
         result.push({'deposited' : deposited,
+                    'totalDeposited' : totalDeposited,
                     'minted' : minted,
                     'blockNumber' : blockNumber
                     })
@@ -46,11 +49,14 @@ export const getPoolExited = async () => {
         toBlock: "latest"
       }
     let result = []
+    let totalExited = 0
     const res = await provider.getLogs(logInfo)
     for(let i=0;i<res.length;i++){
-        const amount = parseInt(res[i]['data'].substr(0,66),16)/1e18
+        const exited = parseInt(res[i]['data'].substr(0,66),16)/1e18
         const blockNumber = res[i]['blockNumber']
-        result.push({'amount exited' : amount,
+        totalExited += exited
+        result.push({'exited' : exited,
+                    'totalExited' : totalExited,
                     'blockNumber' : blockNumber
                     })
     }
