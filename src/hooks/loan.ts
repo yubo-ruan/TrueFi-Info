@@ -20,6 +20,7 @@ export const getAllLoanCreated = async () => {
     const res = await provider.getLogs(logInfo)
     for(let i=0;i<res.length;i++){
         const loanTokenAddr = '0x' + res[i]['data'].substr(26,44)
+        console.log(loanTokenAddr)
         const loanToken = new ethers.Contract(loanTokenAddr, abi, wallet)
         const para = await loanToken.getParameters()
         loans.push({'borrower': await loanToken.borrower(), 

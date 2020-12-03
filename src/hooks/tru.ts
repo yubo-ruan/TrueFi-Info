@@ -7,8 +7,8 @@ const abi = ['function totalSupply() public view returns (uint256)','function di
 const TrustToken = new ethers.Contract(contracts.tru, abi, wallet)
 
 export const getTruStat = async () => {
-    const supply = await TrustToken.totalSupply()/1e10
-    const MAX_SUPPLY = 14500000
+    const supply = await TrustToken.totalSupply()/1e8
+    const MAX_SUPPLY = 1450000000
     const burned = MAX_SUPPLY - supply
     let distributed = 0
     const linearDistributors = [
@@ -19,7 +19,7 @@ export const getTruStat = async () => {
     ]
     for(let i = 0; i < linearDistributors.length; i++) {
         const distributor = new ethers.Contract(linearDistributors[i], abi, wallet)
-        distributed += await distributor.distributed()/1e10
+        distributed += await distributor.distributed()/1e8
     }
     return {'supply' : supply,
             'burned' : burned,
