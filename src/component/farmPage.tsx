@@ -42,7 +42,7 @@ export const FarmPage: React.FC = () => {
             title: 'totalFarmRewards',
             dataIndex: 'totalFarmRewards',
             key: 'totalFarmRewards',
-            render: (text: number) => <a>{text.toFixed(0)}</a>,
+            render: (text: number) => <a>{text.toFixed(0)} TRU</a>,
         },
         {
             title: 'totalStaked',

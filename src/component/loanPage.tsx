@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import {Table, Tag } from 'antd'
+import {Table, Tag, Typography } from 'antd'
 import {getAllLoanCreated, getAllVoteEvent} from '../hooks/loan'
+const { Title, Paragraph, Text, Link } = Typography;
 
 
 export const LoanPage: React.FC = () => {
@@ -11,7 +12,7 @@ export const LoanPage: React.FC = () => {
         getAllLoanCreated().then(res => setLoan(res))
         getAllVoteEvent().then(res => setVote(res))
     }, []);
-    const columns = [
+    const loanColumns = [
         {
           title: 'Amount',
           dataIndex: 'amount',
@@ -36,6 +37,7 @@ export const LoanPage: React.FC = () => {
           title: 'Borrower',
           key: 'borrower',
           dataIndex: 'borrower',
+          render: (text: string) => <Link href={'https://etherscan.io/address/'+text} target="_blank">{text}</Link>,
         },
         {
           title: 'Blocknumber',
@@ -46,7 +48,7 @@ export const LoanPage: React.FC = () => {
           title: 'Profit',
           key: 'profit',
           dataIndex: 'profit',
-          render: (text: number) => <a>${text.toFixed(4)}</a>,
+          render: (text: number) => <a>${text.toFixed(2)}</a>,
         }
       ];
     const voteColumns = [
@@ -60,19 +62,19 @@ export const LoanPage: React.FC = () => {
         title: 'Staked',
         key: 'staked',
         dataIndex: 'staked',
-        render: (text: number) => <a>{text.toFixed(2)} TRU</a>,
+        render: (text: number) => <Text>{text.toFixed(2)} TRU</Text>,
       },
       {
         title: 'Voter',
         key: 'voter',
         dataIndex: 'voter',
-        render: (text: number) => <a>{text}</a>,
+        render: (text: string) => <Link href={'https://etherscan.io/address/'+text} target="_blank">{text}</Link>,
       },
       {
-        title: 'LoanID',
+        title: 'Loan Token Address',
         key: 'loanId',
         dataIndex: 'loanId',
-        render: (text: number) => <a>{text}</a>,
+        render: (text: string) => <Link href={'https://etherscan.io/address/'+text} target="_blank">{text}</Link>,
       },
       {
         title: 'Blocknumber',
@@ -83,7 +85,9 @@ export const LoanPage: React.FC = () => {
   getAllVoteEvent()
   return(
     <div>
-        <Table columns={columns} dataSource={loan} />
+        <Title level={4}>Outstanding Loans</Title>
+        <Table columns={loanColumns} dataSource={loan} />
+        <Title level={4}>Historical Votes</Title>
         <Table columns={voteColumns} dataSource={vote} />
     </div>
   )

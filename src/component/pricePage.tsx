@@ -18,7 +18,7 @@ export const PricePage: React.FC = () => {
     <Row gutter={16}>
         <Col span={8}>
             <Card>
-            <Statistic title="TRU in USD" value={truPrice.priceInUsd} precision={2} valueStyle={{ color: '#3f8600' }} prefix="$"/>
+            <Statistic title="TRU in USD" value={truPrice.priceInUsd} precision={3} valueStyle={{ color: '#3f8600' }} prefix="$"/>
             </Card>
         </Col>
         <Col span={8}>
