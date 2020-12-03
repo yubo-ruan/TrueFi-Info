@@ -5,6 +5,7 @@ import { contracts } from './constants'
 const [network, provider, wallet] = connect()
 const abi = ['function borrower() public view returns (address)',
                  'function getParameters() external view returns (uint256,uint256,uint256)',
+                 'function profit() public view returns (address)',
                  'function profit() public view returns (address)'
                 ]
                 
@@ -20,7 +21,6 @@ export const getAllLoanCreated = async () => {
     const res = await provider.getLogs(logInfo)
     for(let i=0;i<res.length;i++){
         const loanTokenAddr = '0x' + res[i]['data'].substr(26,44)
-        console.log(loanTokenAddr)
         const loanToken = new ethers.Contract(loanTokenAddr, abi, wallet)
         const para = await loanToken.getParameters()
         loans.push({'borrower': await loanToken.borrower(), 
@@ -34,3 +34,28 @@ export const getAllLoanCreated = async () => {
     return loans
 }
 
+export const getAllVoteEvent = async () => {
+    let logInfo = {
+        address: contracts.creditMarket,
+        topics: [ethers.utils.id('Voted(address,address,bool,uint256)')],
+        fromBlock: 0,
+        toBlock: "latest"
+      }
+    let result = []
+    const res = await provider.getLogs(logInfo)
+    for(let i=0;i<res.length;i++){
+        const blockNumber = res[i]['blockNumber']
+        const staked = parseInt(res[i]['data'].substr(194,258),16)/1e8
+        const loanId = '0x'+res[i]['data'].substr(26,40)
+        const voter = '0x'+res[i]['data'].substr(90,91).substr(0,42)
+        const vote = res[i]['data'].substr(192,193).substr(0,2)
+        console.log(res[i]['transactionHash'])
+        result.push({vote : (vote == '01')? 'YES':'NO',
+                    staked : staked,
+                    voter : voter,
+                    loanId : loanId,
+                    blockNumber : blockNumber
+                    })
+    }
+    return result
+}
