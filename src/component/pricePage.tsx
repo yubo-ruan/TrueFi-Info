@@ -5,8 +5,8 @@ import {getTruPrice, getTfiPrice} from '../hooks/price'
 
 export const PricePage: React.FC = () => {
 
-    const [truPrice, setTruPrice] = useState({priceInEth:0, priceInUsd:0})
-    const [tfiPrice, setTfiPrice] = useState(0)
+    const [truPrice, setTruPrice] = useState({priceInEth:0, priceInUsd:0, poolValue:0})
+    const [tfiPrice, setTfiPrice] = useState({price:0,poolValue:0})
 
     useEffect(() => {
         getTruPrice().then(res => setTruPrice(res))
@@ -15,6 +15,7 @@ export const PricePage: React.FC = () => {
 
    
   return(
+    <>
     <Row gutter={16}>
         <Col span={8}>
             <Card>
@@ -28,10 +29,21 @@ export const PricePage: React.FC = () => {
         </Col>
         <Col span={8}>
             <Card>
-            <Statistic title="TFI in USD" value={tfiPrice} precision={4} valueStyle={{ color: '#3f8600' }} prefix="$"/>
+                <Statistic title="TFI in TUSD" value={tfiPrice.price} precision={4} valueStyle={{ color: '#3f8600' }} prefix="$"/>
+            </Card>
+        </Col>
+        <Col span={8}>
+            <Card>
+                <Statistic title="Uniswap TUSD/TFI Pool Value" value={tfiPrice.poolValue} precision={0} valueStyle={{ color: 'red' }} prefix="$"/>
+            </Card>
+        </Col>
+        <Col span={8}>
+            <Card>
+                <Statistic title="Uniswap TRU/ETH Pool Value" value={truPrice.poolValue} precision={0} valueStyle={{ color: 'red' }} prefix="$"/>
             </Card>
         </Col>
     </Row>
+    </>
   )
 };
 

@@ -15,54 +15,24 @@ export const getPoolValue = async () => {
     return await tfi.poolValue()/1e18
 }
 
-export const getPoolJoined = async () => {
-    let logInfo = {
-        address: contracts.tfi,
-        topics: [ethers.utils.id('Joined(address,uint256,uint256)')],
-        fromBlock: 0,
-        toBlock: "latest"
+const getEventsHelper = async (topic:string,startIndex:number,endIndex:number) => {
+    let result = []
+    let total = 0
+    const logInfo = {address: contracts.tfi, topics:[ethers.utils.id(topic)], fromBlock: 0, toBlock: "latest"}    
+    const res = await provider.getLogs(logInfo)
+    for(let i=0;i<res.length;i++){
+        const value = parseInt(res[i]['data'].substr(startIndex,endIndex),16)/1e18
+        if(topic == 'Borrow(address,uint256,uint256)'){
+            console.log(res[i])
+            console.log(res[i]['data'].substr(startIndex,endIndex))
         }
-    let result = []
-    let totalDeposited = 0
-    const res = await provider.getLogs(logInfo)
-    for(let i=0;i<res.length;i++){
-        const deposited = parseInt(res[i]['data'].substr(0,66),16)/1e18
-        const minted = parseInt(res[i]['data'].substr(67,129),16)/1e18
-        const blockNumber = res[i]['blockNumber']
-        totalDeposited += deposited
-        result.push({total : totalDeposited,
-                    value : deposited,
-                    blockNumber : blockNumber
-                    })
+        total += value
+        result.push({total: total,
+                    value: value,
+                    blockNumber: res[i]['blockNumber']})
     }
     return result
 }
-export const getPoolExited = async () => {
-    let logInfo = {
-        address: contracts.tfi,
-        topics: [ethers.utils.id('Exited(address,uint256)')],
-        fromBlock: 0,
-        toBlock: "latest"
-      }
-    let result = []
-    let totalExited = 0
-    const res = await provider.getLogs(logInfo)
-    for(let i=0;i<res.length;i++){
-        const exited = parseInt(res[i]['data'].substr(0,66),16)/1e18
-        const blockNumber = res[i]['blockNumber']
-        totalExited += exited
-        result.push({total : totalExited,
-                    value : -exited,
-                    blockNumber : blockNumber
-                    })
-    }
-    return result
-}
-export const getNetPool = async () => {
-    const array = [...await getPoolJoined(),...await getPoolExited()]
-    return mergeArray(array)
-}
-
 const mergeArray = (array: any[]) => {
     array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
     for(let i=1;i<array.length;i++){
@@ -75,49 +45,35 @@ const mergeArray = (array: any[]) => {
     return array
 }
 
+export const getPoolJoined = async () => {
+    return getEventsHelper('Joined(address,uint256,uint256)',0,66)
+}
+export const getPoolExited = async () => {
+    return getEventsHelper('Exited(address,uint256)',0,66)
+}
+export const getNetPool = async () => {
+    const array = [...await getPoolJoined(),...await getPoolExited()]
+    return mergeArray(array)
+}
+
+
 export const getFlushed = async () => {
-    let logInfo = {
-        address: contracts.tfi,
-        topics: [ethers.utils.id('Flushed(uint256)')],
-        fromBlock: 0,
-        toBlock: "latest"
-      }
-    let result = []
-    let totalFlushed = 0
-    const res = await provider.getLogs(logInfo)
-    for(let i=0;i<res.length;i++){
-        const amount = parseInt(res[i]['data'].substr(34,65),16)/1e18
-        const blockNumber = res[i]['blockNumber']
-        totalFlushed += amount
-        result.push({total: totalFlushed,
-                    value: amount,
-                    blockNumber : blockNumber})
-    }
-    return result
+    return getEventsHelper('Flushed(uint256)',34,65)
 }
 
 export const getPulled = async () => {
-    let logInfo = {
-        address: contracts.tfi,
-        topics: [ethers.utils.id('Pulled(uint256)')],
-        fromBlock: 0,
-        toBlock: "latest"
-      }
-    let result = []
-    let totalPulled = 0
-    const res = await provider.getLogs(logInfo)
-    for(let i=0;i<res.length;i++){
-        const pulled = parseInt(res[i]['data'].substr(34,65),16)/1e18
-        const blockNumber = res[i]['blockNumber']
-        totalPulled += pulled
-        result.push({total: totalPulled,
-                    value: pulled,
-                    blockNumber : blockNumber})
-    }
-    return result
+    return getEventsHelper('Pulled(uint256)',34,65)
 }
 
 export const getNetCurve = async () => {
     const array = [...await getFlushed(),...await getPulled()]
     return mergeArray(array)
+}
+
+export const getBorrow = async () => {
+    return getEventsHelper('Borrow(address,uint256,uint256)',66,67)
+}
+
+export const getRepaid = async () => {
+    return getEventsHelper('Repaid(uint256)',34,65)
 }

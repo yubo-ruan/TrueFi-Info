@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Area } from '@ant-design/charts';
 import {Typography, Statistic, Card, Row, Col, Divider, Table} from 'antd'
-import {getTfiTotalSupply, getPoolValue, getPoolJoined, getPoolExited, getNetPool, getNetCurve} from '../hooks/pool'
+import {getTfiTotalSupply, getPoolValue, getPoolJoined, getPoolExited, getNetPool, getNetCurve, getBorrow} from '../hooks/pool'
 const { Title, Paragraph, Text, Link } = Typography;
 
 
@@ -24,6 +24,7 @@ export const PoolPage: React.FC = () => {
     }))
     getNetPool().then(res => setPoolValue(res))
     getNetCurve().then(res => setCurve(res))
+    getBorrow()
   }, []);
 
   

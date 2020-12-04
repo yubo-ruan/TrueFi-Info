@@ -7,7 +7,7 @@ import {getAPY} from '../hooks/truefarm'
 export const FarmPage: React.FC = () => {
 
     const [tru, setTru] = useState({supply : 0,burned : 0, distributed : 0})
-    const [apy, setApy] = useState([{'pool':'','dailyRate':0,'weeklyRate':0,'APY':0,'totalFarmRewards':0,'totalStaked':0,'totalClaimedRewards':0}])
+    const [apy, setApy] = useState([{'pool':'','dailyRate':0,'weeklyRate':0,'APY':0,'totalFarmRewards':0,'totalStakedValue':0,'totalClaimedRewards':0}])
 
     useEffect(() => {
         getAPY().then(res => setApy(res))
@@ -45,10 +45,10 @@ export const FarmPage: React.FC = () => {
             render: (text: number) => <a>{text.toFixed(0)} TRU</a>,
         },
         {
-            title: 'totalStaked',
-            dataIndex: 'totalStaked',
-            key: 'totalStaked',
-            render: (text: number) => <a>{text.toFixed(0)}</a>,
+            title: 'Pool Value',
+            dataIndex: 'totalStakedValue',
+            key: 'totalStakedValue',
+            render: (text: number) => <a>${text.toFixed(0)}</a>,
         },
         {
             title: 'totalClaimedRewards',

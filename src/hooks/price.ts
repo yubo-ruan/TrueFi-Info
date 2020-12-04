@@ -5,11 +5,12 @@ import { contracts } from './constants'
 const [network, provider, wallet] = connect()
 const abi = ['function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)']
 
-
 export const getTfiPrice = async() => {
     const uniswapTfi = new ethers.Contract(contracts.uniswapTusdTfi, abi, wallet)
     const reserves = await uniswapTfi.getReserves()
-    return reserves["_reserve1"]/reserves["_reserve0"]
+    const price = reserves["_reserve0"]/reserves["_reserve1"]
+    const poolValue = (reserves["_reserve0"]/1e18+reserves["_reserve1"]/1e18)*price
+    return {price:price,poolValue:poolValue}
 }
 
 export const getTruPrice = async() => {
@@ -20,8 +21,10 @@ export const getTruPrice = async() => {
     const priceInEth = res1/res0
     const ethPrice = await getEthPrice()
     const priceInUsd = priceInEth*ethPrice
-    return {'priceInEth' : priceInEth,
-            'priceInUsd' : priceInUsd}
+    const poolValue = res0*priceInUsd+res1*ethPrice
+    return {priceInEth : priceInEth,
+            priceInUsd : priceInUsd,
+            poolValue : poolValue}
 }
 
 export const getEthPrice = async() => {
