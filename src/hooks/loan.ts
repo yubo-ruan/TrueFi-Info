@@ -6,8 +6,8 @@ const [network, provider, wallet] = connect()
 const abi = ['function borrower() public view returns (address)',
                  'function getParameters() external view returns (uint256,uint256,uint256)',
                  'function profit() public view returns (address)',
-                 'function profit() public view returns (address)'
-                ]
+                 'function status() public view returns (uint8)'
+            ]
                 
 export const getAllLoanCreated = async () => {
     let logInfo = {
@@ -18,6 +18,7 @@ export const getAllLoanCreated = async () => {
       }
     
     let loans = []
+    const statusType = ['Listed','','Withdrawn','Settled']
     const res = await provider.getLogs(logInfo)
     for(let i=0;i<res.length;i++){
         const loanTokenAddr = '0x' + res[i]['data'].substr(26,44)
@@ -28,7 +29,8 @@ export const getAllLoanCreated = async () => {
                     'apy': para[1]/1e2,
                     'term': para[2]/1e5,
                     'profit': await loanToken.profit()/1e18,
-                    'blockNumber' : res[i]['blockNumber']
+                    'blockNumber' : res[i]['blockNumber'],
+                    status : statusType[await loanToken.status()]
         })
     }
     return loans
@@ -49,7 +51,6 @@ export const getAllVoteEvent = async () => {
         const loanId = '0x'+res[i]['data'].substr(26,40)
         const voter = '0x'+res[i]['data'].substr(90,91).substr(0,40)
         const vote = res[i]['data'].substr(192,193).substr(0,2)
-        console.log(res[i]['transactionHash'])
         result.push({vote : (vote == '01')? 'YES':'NO',
                     staked : staked,
                     voter : voter,
