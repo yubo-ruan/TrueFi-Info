@@ -27,7 +27,7 @@ export const getAllLoanCreated = async () => {
         loans.push({'borrower': await loanToken.borrower(), 
                     'amount': para[0]/1e18,
                     'apy': para[1]/1e2,
-                    'term': para[2]/1e5,
+                    'term': para[2]/(60*60*24),
                     'profit': await loanToken.profit()/1e18,
                     'blockNumber' : res[i]['blockNumber'],
                     status : statusType[await loanToken.status()]
