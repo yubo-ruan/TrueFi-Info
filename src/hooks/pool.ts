@@ -15,6 +15,7 @@ export const getPoolValue = async () => {
     return await tfi.poolValue()/1e18
 }
 
+
 const getEventsHelper = async (topic:string,startIndex:number,endIndex:number) => {
     let result = []
     let total = 0
