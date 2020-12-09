@@ -23,7 +23,9 @@ export const contracts = {
     uniswapEthUsdc: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
     trueFarmTfi: "0x8fd832757f58f71bac53196270a4a55c8e1a29d9",
     trueFarmUniEth: "0xed45cf4895c110f464ce857ebe5f270949ec2ff4",
-    trueFarmUniTfi: "0xf8f14fbb93fa0cefe35acf7e004fd4ef92d8315a"
+    trueFarmUniTfi: "0xf8f14fbb93fa0cefe35acf7e004fd4ef92d8315a",
+    loan1: "0xa42f00Db95BE452C59EFaC6292294D6B44b500c3",
+    loan2: "0x6ed5F68F11826F36e12D134845032BD8f53B4e22"
 }
 
 export const wallets = {

@@ -4,12 +4,15 @@ import { contracts } from './constants'
 import { stringify } from 'querystring'
 
 const [network, provider, wallet] = connect()
-const abi = ['function totalSupply() public view returns (uint256)','function poolValue() public view returns (uint256)']
-const tusdAbi = ["event Transfer(address indexed src, address indexed dst, uint val)"]
+const abi = ['function totalSupply() public view returns (uint256)','function poolValue() public view returns (uint256)','event Borrow(address borrower, uint256 amount, uint256 fee)']
+const tusdAbi = ["event Transfer(address indexed src, address indexed dst, uint val)",'event Funded(address indexed loanToken, uint256 amount)','function totalSupply() public view returns (uint256)']
 const curveGaugeAbi = ['event Deposit(address indexed provider, uint256 value)','event Withdraw(address indexed provider, uint256 value)']
 const tfi = new ethers.Contract(contracts.tfi, abi, wallet) 
 const tusd = new ethers.Contract(contracts.tusd, tusdAbi, wallet) 
 const curveGauge = new ethers.Contract(contracts.curveGauge, curveGaugeAbi, wallet) 
+const loan1 = new ethers.Contract(contracts.loan1, tusdAbi, wallet) 
+const loan2 = new ethers.Contract(contracts.loan2, tusdAbi, wallet) 
+const lender = new ethers.Contract(contracts.lender, tusdAbi, wallet) 
 
 export const getTfiTotalSupply = async () => {
     return await tfi.totalSupply()/1e18
@@ -78,25 +81,6 @@ export const getPulled = async () => {
     return array
 }
 
-export const getBorrow = async () => {
-    return getEventsHelper('Borrow(address,uint256,uint256)',1)
-}
-
-export const getRepaid = async () => {
-    const array = await getEventsHelper('Repaid(uint256)',0)
-    array.forEach(element => {
-        element.value *= -1                       //turn into nagative value
-      })
-    return array
-}
-
-export const getCollected = async () => {
-    return getEventsHelper('Collected(uint256)',0)
-}
-
-
-
-
 export const getPoolChart = async () => {
     const array = [...await getPoolJoined(),...await getPoolExited()]
     return mergeArray(array)
@@ -104,11 +88,6 @@ export const getPoolChart = async () => {
 
 export const getNetCurve = async () => {
     const array = [...await getFlushed(),...await getPulled()]
-    return mergeArray(array)
-}
-
-export const getLoanChart = async () => {
-    const array = [...await getBorrow(),...await getRepaid()]
     return mergeArray(array)
 }
 
@@ -132,17 +111,28 @@ const mergeArrayNew = (array: any[]) => {
     let newArray:any = []
     array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
     if(array[0].data.name === 'TUSD'){
-        newArray[0] = {TUSD:array[0].data.balance,yCRV:0,blockNumber:array[0].blockNumber}
-    }else{
-        newArray[0] = {TUSD:0,yCRV:array[0].data.balance,blockNumber:array[0].blockNumber}
+        newArray[0] = {TUSD:array[0].data.balance,yCRV:0,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber}
+    }else if(array[0].data.name === 'yCRV'){
+        newArray[0] = {TUSD:0,yCRV:array[0].data.balance,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber}
+    }else if(array[0].data.name === 'Loan1'){
+        newArray[0] = {TUSD:0,yCRV:0,Loan1:array[0].data.balance,Loan2:0,blockNumber:array[0].blockNumber}
+    }
+    else{
+        newArray[0] = {TUSD:0,yCRV:0,Loan1:0,Loan2:array[0].data.balance,blockNumber:array[0].blockNumber}
     }
     
     for(let i=1;i<array.length;i++){
         if(array[i].data.name === 'TUSD'){
-            newArray.push({TUSD:array[i].data.balance,yCRV: newArray[i-1].yCRV,blockNumber:array[i].blockNumber})
+            newArray.push({TUSD:array[i].data.balance,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber})
         }
         if(array[i].data.name === 'yCRV'){
-            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:array[i].data.balance,blockNumber:array[i].blockNumber})
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:array[i].data.balance,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber})
+        }
+        if(array[i].data.name === 'Loan1'){
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:array[i].data.balance,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber})
+        }
+        if(array[i].data.name === 'Loan2'){
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:array[i].data.balance,blockNumber:array[i].blockNumber})
         }
     }
     
@@ -158,12 +148,18 @@ export const TusdHistoricalBal = async () => {
     const curveOutFilter = {address: contracts.curveGauge, topics:curveGauge.filters.Withdraw(contracts.tfi).topics, fromBlock: 0, toBlock: "latest"}    
     const curveInFilter = {address: contracts.curveGauge, topics:curveGauge.filters.Deposit(contracts.tfi).topics, fromBlock: 0, toBlock: "latest"}
 
+    const loan1OutFilter = {address: contracts.loan1, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+    const loan1InFilter = {address: contracts.loan1, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+
+    const loan2OutFilter = {address: contracts.loan2, topics:loan2.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+    const loan2InFilter = {address: contracts.loan2, topics:loan2.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+
     const tusdArray = mergeArray([...await eventHelper(tusdOutFilter,-1),...await eventHelper(tusdInFilter,1)])
     const curveArray = mergeArray([...await eventHelper(curveOutFilter,-1),...await eventHelper(curveInFilter,1)])
-
-
+    const loan1Array = mergeArray([...await eventHelper(loan1OutFilter,-1),...await eventHelper(loan1InFilter,1),...await loanTokenHelper(contracts.loan1)])
+    const loan2Array = mergeArray([...await eventHelper(loan2OutFilter,-1),...await eventHelper(loan2InFilter,1),...await loanTokenHelper(contracts.loan2)])
     
-    const combined = mergeArrayNew([...processArray(tusdArray,'TUSD'),...processArray(curveArray,'yCRV')])
+    const combined = mergeArrayNew([...processArray(tusdArray,'TUSD'),...processArray(curveArray,'yCRV'),...processArray(loan1Array,'Loan1'),...processArray(loan2Array,'Loan2')])
 
 
     return combined
@@ -172,15 +168,25 @@ export const TusdHistoricalBal = async () => {
 const eventHelper = async (filter: ethers.providers.Filter, sign:number) => {
     let result: { total: number; value: number; blockNumber: number }[] = []
     let total = 0 
-    const res = await provider.getLogs(filter).then(res => {
+    await provider.getLogs(filter).then(res => {
         for(let i=0;i<res.length;i++){
             const value = parseInt(res[i]['data'].substr(2,64),16)/1e18
-            
             result.push({total: 0,
                         value: value*sign,
                         blockNumber: res[i]['blockNumber']})
         }
     })
     
+    return result
+}
+
+const loanTokenHelper = async(address:string) => {
+
+    let result: { total: number; value: number; blockNumber: number }[] = []
+    const loanContract = new ethers.Contract(address, tusdAbi, wallet) 
+    const value = await loanContract.totalSupply()/1e18
+    await provider.getLogs({address: contracts.lender, topics:lender.filters.Funded(address).topics, fromBlock: 0, toBlock: "latest"}).then(res => {
+            result.push({total: 0,value: value,blockNumber: res[0]['blockNumber']})
+    })
     return result
 }
