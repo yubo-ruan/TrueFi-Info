@@ -9,15 +9,15 @@ import {FarmPage} from './component/farmPage'
 import {PricePage} from './component/pricePage'
 
 const { TabPane } = Tabs;
-const { Title, Paragraph, Text, Link } = Typography;
-const { Header, Content, Footer } = Layout;
+const { Title } = Typography;
+const { Content } = Layout;
 
 
 function App() {
 
   return (    
     <Content style={{ padding: '25px 25px' }}>
-      <Title>TrueFi Vision Dashboard</Title>
+      <Title>TrueFi Info</Title>
       <Tabs tabPosition='left'>
         <TabPane tab="Loan Stat" key="1">
           <LoanPage />
