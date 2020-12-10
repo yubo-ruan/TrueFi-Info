@@ -1,8 +1,8 @@
-import { ethers, Contract } from 'ethers'
+import { ethers } from 'ethers'
 import { connect } from './providers'
 import { contracts } from './constants'
 
-const [network, provider, wallet] = connect()
+const [, , wallet] = connect()
 const abi = ['function totalSupply() public view returns (uint256)','function distributed() public view returns (uint256)']
 const TrustToken = new ethers.Contract(contracts.tru, abi, wallet)
 

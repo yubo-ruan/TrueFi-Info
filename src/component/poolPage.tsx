@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import {Typography, Statistic, Card, Row, Col, Divider, Table} from 'antd'
+import {Typography, Statistic, Card, Row, Col} from 'antd'
 import {getTfiTotalSupply, getPoolValue, getPoolChart, getNetCurve, TusdHistoricalBal} from '../hooks/pool'
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts'
-
-const { Title, Paragraph, Text, Link } = Typography
-
 
 export const PoolPage: React.FC = () => {
   

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {Table, Tag, Typography } from 'antd'
 import {getAllLoanCreated, getAllVoteEvent} from '../hooks/loan'
-const { Title, Paragraph, Text, Link } = Typography;
+const { Title, Text, Link } = Typography;
 
 
 export const LoanPage: React.FC = () => {
@@ -48,7 +48,7 @@ export const LoanPage: React.FC = () => {
           title: 'Profit',
           key: 'profit',
           dataIndex: 'profit',
-          render: (text: number) => <a>${text.toFixed(0)}</a>,
+          render: (text: number) => <Text>${text.toFixed(0)}</Text>,
         },
         {
           title: 'Status',
@@ -62,7 +62,7 @@ export const LoanPage: React.FC = () => {
         title: 'Vote',
         dataIndex: 'vote',
         key: 'vote',
-        render: (text: string) => <a>{text}</a>,
+        render: (text: string) => <Text>{text}</Text>,
       },
       {
         title: 'Staked',

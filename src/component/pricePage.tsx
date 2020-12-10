@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {Statistic, Card, Row, Col, Empty} from 'antd'
+import {Statistic, Card, Row, Col} from 'antd'
 import {getTruPrice, getTfiPrice} from '../hooks/price'
 
 

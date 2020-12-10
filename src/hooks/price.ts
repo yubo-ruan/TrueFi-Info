@@ -1,8 +1,8 @@
-import { ethers, Contract } from 'ethers'
+import { ethers } from 'ethers'
 import { connect } from './providers'
 import { contracts } from './constants'
 
-const [network, provider, wallet] = connect()
+const [, , wallet] = connect()
 const abi = ['function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)']
 
 export const getTfiPrice = async() => {

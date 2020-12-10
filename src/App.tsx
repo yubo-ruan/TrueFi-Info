@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Typography, Tabs, Layout} from 'antd';
+import React from 'react';
+import {Typography, Tabs, Layout} from 'antd';
 import 'antd/dist/antd.css';
 
 

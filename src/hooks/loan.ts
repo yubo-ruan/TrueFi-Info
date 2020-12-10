@@ -1,8 +1,8 @@
-import { ethers, Contract } from 'ethers'
+import { ethers } from 'ethers'
 import { connect } from './providers'
 import { contracts } from './constants'
 
-const [network, provider, wallet] = connect()
+const [, provider, wallet] = connect()
 const abi = ['function borrower() public view returns (address)',
                  'function getParameters() external view returns (uint256,uint256,uint256)',
                  'function profit() public view returns (address)',
@@ -51,7 +51,7 @@ export const getAllVoteEvent = async () => {
         const loanId = '0x'+res[i]['data'].substr(26,40)
         const voter = '0x'+res[i]['data'].substr(90,91).substr(0,40)
         const vote = res[i]['data'].substr(192,193).substr(0,2)
-        result.push({vote : (vote == '01')? 'YES':'NO',
+        result.push({vote : (vote === '01')? 'YES':'NO',
                     staked : staked,
                     voter : voter,
                     loanId : loanId,

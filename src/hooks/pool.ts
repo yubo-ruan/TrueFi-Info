@@ -1,9 +1,8 @@
 import { ethers } from 'ethers'
 import { connect } from './providers'
 import { contracts } from './constants'
-import { stringify } from 'querystring'
 
-const [network, provider, wallet] = connect()
+const [, provider, wallet] = connect()
 const abi = ['function totalSupply() public view returns (uint256)','function poolValue() public view returns (uint256)','event Borrow(address borrower, uint256 amount, uint256 fee)']
 const tusdAbi = ["event Transfer(address indexed src, address indexed dst, uint val)",'event Funded(address indexed loanToken, uint256 amount)','function totalSupply() public view returns (uint256)']
 const curveGaugeAbi = ['event Deposit(address indexed provider, uint256 value)','event Withdraw(address indexed provider, uint256 value)']
@@ -167,7 +166,6 @@ export const TusdHistoricalBal = async () => {
 
 const eventHelper = async (filter: ethers.providers.Filter, sign:number) => {
     let result: { total: number; value: number; blockNumber: number }[] = []
-    let total = 0 
     await provider.getLogs(filter).then(res => {
         for(let i=0;i<res.length;i++){
             const value = parseInt(res[i]['data'].substr(2,64),16)/1e18

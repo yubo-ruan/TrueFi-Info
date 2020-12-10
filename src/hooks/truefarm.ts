@@ -1,10 +1,10 @@
-import { ethers, Contract } from 'ethers'
+import { ethers } from 'ethers'
 import { contracts } from './constants'
 import { connect } from './providers'
 import {getTruPrice, getTfiPrice} from './price'
 
 
-const [network, provider, wallet] = connect()
+const [, , wallet] = connect()
 const abi = ['function totalFarmRewards() public view returns (uint256)',
             'function totalStaked() public view returns (uint256)',
             'function totalClaimedRewards() public view returns (uint256)']
@@ -43,9 +43,5 @@ export const getAPY = async () => {
     return APYs
 }
 
-const getTotalStakeValue = async(index:number) => {
-    const truefarm = new ethers.Contract(contracts.trueFarmTfi, abi, wallet)
-    
-}
 
 

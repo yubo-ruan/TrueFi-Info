@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import {Statistic, Card, Row, Col, Table, Tag } from 'antd'
+import {Statistic, Card, Row, Col, Table, Tag, Typography } from 'antd'
 import {getTruStat} from '../hooks/tru'
 import {getAPY} from '../hooks/truefarm'
 
+const { Text } = Typography;
 
 export const FarmPage: React.FC = () => {
 
@@ -18,7 +19,7 @@ export const FarmPage: React.FC = () => {
             title: 'Pool',
             dataIndex: 'pool',
             key: 'pool',
-            render: (text: string) => <a>{text}</a>,
+            render: (text: string) => <Text>{text}</Text>,
         },
         {
           title: 'DailyRate',
@@ -42,19 +43,19 @@ export const FarmPage: React.FC = () => {
             title: 'totalFarmRewards',
             dataIndex: 'totalFarmRewards',
             key: 'totalFarmRewards',
-            render: (text: number) => <a>{text.toFixed(0)} TRU</a>,
+            render: (text: number) => <Text>{text.toFixed(0)} TRU</Text>,
         },
         {
             title: 'Pool Value',
             dataIndex: 'totalStakedValue',
             key: 'totalStakedValue',
-            render: (text: number) => <a>${text.toFixed(0)}</a>,
+            render: (text: number) => <Text>${text.toFixed(0)}</Text>,
         },
         {
             title: 'totalClaimedRewards',
             dataIndex: 'totalClaimedRewards',
             key: 'totalClaimedRewards',
-            render: (text: number) => <a>{text.toFixed(0)} TRU</a>,
+            render: (text: number) => <Text>{text.toFixed(0)} TRU</Text>,
         },
       ];
 
