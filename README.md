@@ -1,3 +1,3 @@
-# Getting Started with TrueFi Vision Dashboard
+# Getting Started with TrueFi Info
 
 ### `yarn start`

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import {Typography, Statistic, Card, Row, Col} from 'antd'
+import { Statistic, Card, Row, Col, Typography} from 'antd'
 import {getTfiTotalSupply, getPoolValue, getPoolChart, getNetCurve, TusdHistoricalBal} from '../hooks/pool'
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts'
+const { Title } = Typography;
+
 
 export const PoolPage: React.FC = () => {
   
@@ -36,6 +38,7 @@ export const PoolPage: React.FC = () => {
           </Card>
         </Col>
       </Row>  
+      <Title level={2}>Pool Value Line Chart</Title>
       <LineChart width={1000} height={300} data={poolChart} margin={{top: 30, right: 30, left: 30, bottom: 30,}}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="blockNumber" />
@@ -45,15 +48,7 @@ export const PoolPage: React.FC = () => {
         <Line type="monotone" dataKey="total" stroke="#8884d8" />
         <Line type="monotone" dataKey="value" stroke="#82ca9d" />
       </LineChart>
-      <LineChart width={1000} height={300} data={curveChart} margin={{top: 30, right: 30, left: 30, bottom: 30,}}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="blockNumber" />
-        <YAxis type="number" tickMargin={10} />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="total" stroke="#8884d8" />
-        <Line type="monotone" dataKey="value" stroke="#82ca9d" />
-      </LineChart>
+      <Title level={2}>Pool Composition Line Chart</Title>
       <LineChart width={1200} height={500} data={combinedChart} margin={{top: 30, right: 30, left: 30, bottom: 30,}}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="blockNumber" />
@@ -64,6 +59,16 @@ export const PoolPage: React.FC = () => {
         <Line type="monotone" dataKey="yCRV" stroke="#82ca9d" />
         <Line type="monotone" dataKey="Loan1" stroke="red" />
         <Line type="monotone" dataKey="Loan2" stroke="blue" />
+      </LineChart>
+      <Title level={2}>Pool Interaction with Curve.fi</Title>
+      <LineChart width={1000} height={300} data={curveChart} margin={{top: 30, right: 30, left: 30, bottom: 30,}}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="blockNumber" />
+        <YAxis type="number" tickMargin={10} />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="total" stroke="#8884d8" />
+        <Line type="monotone" dataKey="value" stroke="#82ca9d" />
       </LineChart>
     </div>
   )
