@@ -27,19 +27,19 @@ const getEventsHelper = async (topic:string,index:number) => {
     let total = 0
     const logInfo = {address: contracts.tfi, topics:[ethers.utils.id(topic)], fromBlock: 0, toBlock: "latest"}    
     const res = await provider.getLogs(logInfo)
-    
     for(let i=0;i<res.length;i++){
         const value = parseInt(res[i]['data'].substr(2+64*index,64),16)/1e18
-        if(topic === '1Joined(address,uint256,uint256)'){
-            console.log('default value: ' + value)
-            console.log('1:' + parseInt(res[i]['data'].substr(2,64),16)/1e18)
-            console.log('2:' + parseInt(res[i]['data'].substr(66,64),16)/1e18)
-            console.log('3:' + parseInt(res[i]['data'].substr(129,64),16)/1e18)
-            console.log('topics:'+res[i].topics)
-        }
-        total += value
+        const valueNum = Number(value.toFixed(0))
+        // if(topic === '1Joined(address,uint256,uint256)'){
+        //     console.log('default value: ' + value)
+        //     console.log('1:' + parseInt(res[i]['data'].substr(2,64),16)/1e18)
+        //     console.log('2:' + parseInt(res[i]['data'].substr(66,64),16)/1e18)
+        //     console.log('3:' + parseInt(res[i]['data'].substr(129,64),16)/1e18)
+        //     console.log('topics:'+res[i].topics)
+        // }
+        total += valueNum
         result.push({total: total,
-                    value: value,
+                    marginChange: valueNum,
                     blockNumber: res[i]['blockNumber']})
     }
     return result
@@ -48,7 +48,7 @@ const mergeArray = (array: any[]) => {
     
     array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
     for(let i=1;i<array.length;i++){
-        array[i].total = array[i-1].total + array[i].value
+        array[i].total = array[i-1].total + array[i].marginChange
         if(array[i].blockNumber === array[i-1].blockNumber){
             array.splice(i-1,1)
             i--
@@ -63,7 +63,7 @@ export const getPoolJoined = async () => {
 export const getPoolExited = async () => {
     const array = await getEventsHelper('Exited(address,uint256)',0)
     array.forEach(element => {
-      element.value *= -1                       //turn into nagative value
+      element.marginChange *= -1                       //turn into nagative value
     })
     return array
 }
@@ -75,7 +75,7 @@ export const getFlushed = async () => {
 export const getPulled = async () => {
     const array = await getEventsHelper('Pulled(uint256)',0)
     array.forEach(element => {
-        element.value *= -1                       //turn into nagative value
+        element.marginChange *= -1                       //turn into nagative value
       })
     return array
 }
@@ -101,7 +101,7 @@ export const getCombined = async () => {
 const processArray = (array: any[], name: string) => {
     let newArray = []
     for(let i=1;i<array.length;i++){
-        newArray.push({data:{name:name,balance:array[i].total},blockNumber:array[i].blockNumber})
+        newArray.push({data:{name:name,balance:array[i].total.toFixed(0)},blockNumber:array[i].blockNumber})
     }
     return newArray
 }
@@ -165,12 +165,12 @@ export const TusdHistoricalBal = async () => {
 }
 
 const eventHelper = async (filter: ethers.providers.Filter, sign:number) => {
-    let result: { total: number; value: number; blockNumber: number }[] = []
+    let result: { total: number; marginChange: number; blockNumber: number }[] = []
     await provider.getLogs(filter).then(res => {
         for(let i=0;i<res.length;i++){
             const value = parseInt(res[i]['data'].substr(2,64),16)/1e18
             result.push({total: 0,
-                        value: value*sign,
+                        marginChange: value*sign,
                         blockNumber: res[i]['blockNumber']})
         }
     })
@@ -180,11 +180,11 @@ const eventHelper = async (filter: ethers.providers.Filter, sign:number) => {
 
 const loanTokenHelper = async(address:string) => {
 
-    let result: { total: number; value: number; blockNumber: number }[] = []
+    let result: { total: number; marginChange: number; blockNumber: number }[] = []
     const loanContract = new ethers.Contract(address, tusdAbi, wallet) 
     const value = await loanContract.totalSupply()/1e18
     await provider.getLogs({address: contracts.lender, topics:lender.filters.Funded(address).topics, fromBlock: 0, toBlock: "latest"}).then(res => {
-            result.push({total: 0,value: value,blockNumber: res[0]['blockNumber']})
+            result.push({total: 0,marginChange: value,blockNumber: res[0]['blockNumber']})
     })
     return result
 }
