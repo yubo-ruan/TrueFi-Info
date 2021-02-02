@@ -5,4 +5,4 @@
 ### `yarn start`
 
 
-### See the demo at <lucid-galileo-4e1e8c.netlify.app></lucid-galileo-4e1e8c.netlify.app>
+### See the [demo](lucid-galileo-4e1e8c.netlify.app)
