@@ -4,7 +4,7 @@ import { contracts } from './constants'
 
 const [, provider, wallet] = connect()
 const abi = ['function totalSupply() public view returns (uint256)','function poolValue() public view returns (uint256)','event Borrow(address borrower, uint256 amount, uint256 fee)']
-const tusdAbi = ["event Transfer(address indexed src, address indexed dst, uint val)",'event Funded(address indexed loanToken, uint256 amount)','function totalSupply() public view returns (uint256)']
+const tusdAbi = ["event Transfer(address indexed src, address indexed dst, uint val)",'event Funded(address indexed loanToken, uint256 amount)','function totalSupply() public view returns (uint256)','event LoanTokenCreated(address contractAddress)']
 const curveGaugeAbi = ['event Deposit(address indexed provider, uint256 value)','event Withdraw(address indexed provider, uint256 value)']
 const tfi = new ethers.Contract(contracts.tfi, abi, wallet) 
 const tusd = new ethers.Contract(contracts.tusd, tusdAbi, wallet) 
@@ -185,6 +185,19 @@ const loanTokenHelper = async(address:string) => {
     const value = await loanContract.totalSupply()/1e18
     await provider.getLogs({address: contracts.lender, topics:lender.filters.Funded(address).topics, fromBlock: 0, toBlock: "latest"}).then(res => {
             result.push({total: 0,marginChange: value,blockNumber: res[0]['blockNumber']})
+    })
+    return result
+}
+
+
+export const loanTokenFinder = async() => {
+    let result:string[] = []
+    
+    await provider.getLogs({address: contracts.loanFactory, topics:lender.filters.LoanTokenCreated().topics, fromBlock: 0, toBlock: "latest"}).then(res => {
+        res.map(res => {
+            const addr = '0x'+res['data'].substr(2+24,40)
+            result.push(addr)
+        })
     })
     return result
 }
