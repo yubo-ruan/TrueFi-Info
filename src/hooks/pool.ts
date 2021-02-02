@@ -191,30 +191,30 @@ const loanTokenHelper = async(address:string) => {
 }
 
 
-export const loanTokenFinder = async() => {
-    let result:string[] = []
+// export const loanTokenFinder = async() => {
+//     let result:string[] = []
     
-    await provider.getLogs({address: contracts.loanFactory, topics:lender.filters.LoanTokenCreated().topics, fromBlock: 0, toBlock: "latest"}).then(res => {
-        res.map(res => {
-            const addr = '0x'+res['data'].substr(2+24,40)
-            result.push(addr)
-        })
-    })
-    return result
-}
+//     await provider.getLogs({address: contracts.loanFactory, topics:lender.filters.LoanTokenCreated().topics, fromBlock: 0, toBlock: "latest"}).then(res => {
+//         res.map(res => {
+//             const addr = '0x'+res['data'].substr(2+24,40)
+//             result.push(addr)
+//         })
+//     })
+//     return result
+// }
 
-export const loanTokenBal = async() => {
-    let loanTokenArray: { [x: number]: any; blockNumber: any }[] = []
-    const loanTokens = await loanTokenFinder()
-    loanTokens.map(async (address,index) => {
-        const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
-        const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
-        const loanArray = mergeArray([...await loanTokenHelper(address),...await eventHelper(loanOutFilter,-1),...await eventHelper(loanInFilter,1)])
-        loanArray.map(res => {
-            const result = {[index]:res.total,
-            blockNumber: res.blockNumber}
-            loanTokenArray.push(result)
-        })
-    })
-    return loanTokenArray
-}
+// export const loanTokenBal = async() => {
+//     let loanTokenArray: { [x: number]: any; blockNumber: any }[] = []
+//     const loanTokens = await loanTokenFinder()
+//     loanTokens.map(async (address,index) => {
+//         const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+//         const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+//         const loanArray = mergeArray([...await loanTokenHelper(address),...await eventHelper(loanOutFilter,-1),...await eventHelper(loanInFilter,1)])
+//         loanArray.map(res => {
+//             const result = {[index]:res.total,
+//             blockNumber: res.blockNumber}
+//             loanTokenArray.push(result)
+//         })
+//     })
+//     return loanTokenArray
+// }
