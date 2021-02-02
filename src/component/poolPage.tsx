@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Statistic, Card, Row, Col, Typography} from 'antd'
-import {getTfiTotalSupply, getPoolValue, getPoolChart, getNetCurve, TusdHistoricalBal, loanTokenBal} from '../hooks/pool'
+import {getTfiTotalSupply, getPoolValue, getPoolChart, getNetCurve, TusdHistoricalBal} from '../hooks/pool'
 import {LineChart, Area, AreaChart, ComposedChart, Line, XAxis, YAxis, Bar, CartesianGrid, Tooltip, Legend} from 'recharts'
 const { Title } = Typography;
 
