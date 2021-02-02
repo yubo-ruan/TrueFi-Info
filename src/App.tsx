@@ -19,11 +19,11 @@ function App() {
     <Content style={{ padding: '25px 25px' }}>
       <Title>TrueFi Info</Title>
       <Tabs tabPosition='left'>
-        <TabPane tab="Loan Stat" key="1">
-          <LoanPage />
-        </TabPane>
         <TabPane tab="Pool Value" key="2">
           <PoolPage />
+        </TabPane>
+        <TabPane tab="Loan Stat" key="1">
+          <LoanPage />
         </TabPane>
         <TabPane tab="Farm" key="3">
           <FarmPage />
