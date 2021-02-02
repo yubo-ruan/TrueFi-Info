@@ -93,6 +93,7 @@ export const getNetCurve = async () => {
 export const getCombined = async () => {
     const pool = await getPoolChart()
     const curve = await getNetCurve()
+
     return [...pool,...curve]
 
 }
@@ -155,8 +156,8 @@ export const TusdHistoricalBal = async () => {
 
     const tusdArray = mergeArray([...await eventHelper(tusdOutFilter,-1),...await eventHelper(tusdInFilter,1)])
     const curveArray = mergeArray([...await eventHelper(curveOutFilter,-1),...await eventHelper(curveInFilter,1)])
-    const loan1Array = mergeArray([...await eventHelper(loan1OutFilter,-1),...await eventHelper(loan1InFilter,1),...await loanTokenHelper(contracts.loan1)])
-    const loan2Array = mergeArray([...await eventHelper(loan2OutFilter,-1),...await eventHelper(loan2InFilter,1),...await loanTokenHelper(contracts.loan2)])
+    const loan1Array = mergeArray([...await loanTokenHelper(contracts.loan1),...await eventHelper(loan1OutFilter,-1),...await eventHelper(loan1InFilter,1)])
+    const loan2Array = mergeArray([...await loanTokenHelper(contracts.loan2),...await eventHelper(loan2OutFilter,-1),...await eventHelper(loan2InFilter,1)])
     
     const combined = mergeArrayNew([...processArray(tusdArray,'TUSD'),...processArray(curveArray,'yCRV'),...processArray(loan1Array,'Loan1'),...processArray(loan2Array,'Loan2')])
 
