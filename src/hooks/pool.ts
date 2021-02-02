@@ -202,3 +202,19 @@ export const loanTokenFinder = async() => {
     })
     return result
 }
+
+export const loanTokenBal = async() => {
+    let loanTokenArray: { [x: number]: any; blockNumber: any }[] = []
+    const loanTokens = await loanTokenFinder()
+    loanTokens.map(async (address,index) => {
+        const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+        const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+        const loanArray = mergeArray([...await loanTokenHelper(address),...await eventHelper(loanOutFilter,-1),...await eventHelper(loanInFilter,1)])
+        loanArray.map(res => {
+            const result = {[index]:res.total,
+            blockNumber: res.blockNumber}
+            loanTokenArray.push(result)
+        })
+    })
+    return loanTokenArray
+}
