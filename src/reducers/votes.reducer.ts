@@ -1,22 +1,22 @@
 import { ActionTypes } from "../actions/types";
-import { LoanStore, LoanActions } from "../types/loans.types";
+import { VoteStore, VoteActions } from "../types/votes.types";
 
-const loanStore = {
+const voteStore = {
   logs: {
     status: ActionTypes.NOT_LOADED,
     error: false,
     data: [],
   },
-  loans: {
+  votes: {
     status: ActionTypes.NOT_LOADED,
     error: false,
     data: [],
   },
 };
 
-export const loans = (state: LoanStore = loanStore, action: LoanActions) => {
+export const votes = (state: VoteStore = voteStore, action: VoteActions) => {
   switch (action.type) {
-    case ActionTypes.FETCH_LOANS_LOGS_LOADING: {
+    case ActionTypes.FETCH_VOTES_LOGS_LOADING: {
       return {
         ...state,
         logs: {
@@ -27,7 +27,7 @@ export const loans = (state: LoanStore = loanStore, action: LoanActions) => {
       };
     }
 
-    case ActionTypes.FETCH_LOANS_LOGS_SUCCESS: {
+    case ActionTypes.FETCH_VOTES_LOGS_SUCCESS: {
       return {
         ...state,
         logs: {
@@ -39,7 +39,7 @@ export const loans = (state: LoanStore = loanStore, action: LoanActions) => {
       };
     }
 
-    case ActionTypes.FETCH_LOANS_LOGS_ERROR: {
+    case ActionTypes.FETCH_VOTES_LOGS_ERROR: {
       return {
         ...state,
         logs: {
@@ -50,34 +50,34 @@ export const loans = (state: LoanStore = loanStore, action: LoanActions) => {
       };
     }
 
-    case ActionTypes.FETCH_LOANS_LOADING: {
+    case ActionTypes.FETCH_VOTES_LOADING: {
       return {
         ...state,
-        loans: {
-          ...state.loans,
+        votes: {
+          ...state.votes,
           status: ActionTypes.IS_LOADING,
           error: false,
         },
       };
     }
 
-    case ActionTypes.FETCH_LOANS_SUCCESS: {
+    case ActionTypes.FETCH_VOTES_SUCCESS: {
       return {
         ...state,
-        loans: {
-          ...state.loans,
+        votes: {
+          ...state.votes,
           status: ActionTypes.LOADED,
           error: false,
-          data: state.loans.data.concat(action.data),
+          data: state.votes.data.concat(action.data),
         },
       };
     }
 
-    case ActionTypes.FETCH_LOANS_ERROR: {
+    case ActionTypes.FETCH_VOTES_ERROR: {
       return {
         ...state,
-        loans: {
-          ...state.loans,
+        votes: {
+          ...state.votes,
           status: ActionTypes.LOADING_FAILED,
           error: true,
         },

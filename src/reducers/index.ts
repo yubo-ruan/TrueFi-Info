@@ -1,15 +1,15 @@
 import { combineReducers } from "redux";
-import { logs } from "./logs.reducer";
-import { LogStore } from "../types/logs.types";
 import { loans } from "./loans.reducer";
 import { LoanStore } from "../types/loans.types";
+import { votes } from "./votes.reducer";
+import { VoteStore } from "../types/votes.types";
 
 export interface Store {
-  logs: LogStore;
   loans: LoanStore;
+  votes: VoteStore;
 }
 
 export default combineReducers<Store>({
-  logs: logs,
   loans: loans,
+  votes: votes,
 });

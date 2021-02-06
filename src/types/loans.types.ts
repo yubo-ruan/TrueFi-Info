@@ -1,6 +1,25 @@
 import { ActionTypes } from "../actions/types";
+import { LogItem } from "./shared.types";
 
 // Actions
+export interface InitFetchLoansLogs {
+  type: ActionTypes.FETCH_LOANS_LOGS_LOADING;
+}
+
+export interface FetchLoansLogs {
+  type: ActionTypes.FETCH_LOANS_LOGS;
+}
+
+export interface FetchLoansLogsSuccess {
+  type: ActionTypes.FETCH_LOANS_LOGS_SUCCESS;
+  data: LogItem;
+}
+
+export interface FetchLoansLogsError {
+  type: ActionTypes.FETCH_LOANS_LOGS_ERROR;
+  message: string;
+}
+
 export interface InitFetchLoans {
   type: ActionTypes.FETCH_LOANS_LOADING;
 }
@@ -21,6 +40,10 @@ export interface FetchLoansError {
 }
 
 export type LoanActions =
+  | InitFetchLoansLogs
+  | FetchLoansLogs
+  | FetchLoansLogsSuccess
+  | FetchLoansLogsError
   | InitFetchLoans
   | FetchLoans
   | FetchLoansSuccess
@@ -39,7 +62,14 @@ export interface LoanItem {
 
 // Reducer state
 export interface LoanStore {
-  status: string;
-  error: boolean;
-  loans: LoanItem[];
+  logs: {
+    status: string;
+    error: boolean;
+    data: LogItem[];
+  };
+  loans: {
+    status: string;
+    error: boolean;
+    data: LoanItem[];
+  };
 }
