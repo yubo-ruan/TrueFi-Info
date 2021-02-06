@@ -31,3 +31,34 @@ export const fetchFetchTfiPriceFailure = (
     message: message,
   };
 };
+
+// Fetch TRU price
+export const initFetchTruPrice = (): Types.InitFetchTruPrice => {
+  return {
+    type: ActionTypes.FETCH_TRU_PRICE_LOADING,
+  };
+};
+
+export const fetchTruPrice = (): Types.FetchTruPrice => {
+  return {
+    type: ActionTypes.FETCH_TRU_PRICE,
+  };
+};
+
+export const fetchFetchTruPriceSuccess = (
+  data: Types.TruPriceItem
+): Types.FetchTruPriceSuccess => {
+  return {
+    type: ActionTypes.FETCH_TRU_PRICE_SUCCESS,
+    data: data,
+  };
+};
+
+export const fetchFetchTruPriceFailure = (
+  message: string
+): Types.FetchTruPriceError => {
+  return {
+    type: ActionTypes.FETCH_TRU_PRICE_ERROR,
+    message: message,
+  };
+};
