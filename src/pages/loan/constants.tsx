@@ -1,18 +1,25 @@
 import { Tag, Typography } from "antd";
 const { Text, Link } = Typography;
 
-export const loanColumns = [
+export interface LoanColumnInterface {
+  title: string;
+  dataIndex: string;
+  key: string;
+  render?: (text: number) => JSX.Element;
+}
+
+export const loanColumns: LoanColumnInterface[] = [
   {
     title: "Amount",
     dataIndex: "amount",
     key: "amount",
-    render: (text: any[]) => <Text>${text}</Text>,
+    render: (text) => <Text>${text}</Text>,
   },
   {
     title: "Term",
     dataIndex: "term",
     key: "term",
-    render: (text: number) => (
+    render: (text) => (
       <Tag color="geekblue" key={text}>
         {text.toFixed(0)} Days
       </Tag>
@@ -22,7 +29,7 @@ export const loanColumns = [
     title: "Apy",
     dataIndex: "apy",
     key: "apy",
-    render: (text: number) => (
+    render: (text) => (
       <Tag color="geekblue" key={text}>
         {text.toFixed(2)} %
       </Tag>
@@ -32,7 +39,7 @@ export const loanColumns = [
     title: "Borrower",
     key: "borrower",
     dataIndex: "borrower",
-    render: (text: string) => (
+    render: (text) => (
       <Link href={"https://etherscan.io/address/" + text} target="_blank">
         {text}
       </Link>
@@ -47,13 +54,13 @@ export const loanColumns = [
     title: "Profit",
     key: "profit",
     dataIndex: "profit",
-    render: (text: number) => <Text>${text.toFixed(0)}</Text>,
+    render: (text) => <Text>${text.toFixed(0)}</Text>,
   },
   {
     title: "Status",
     key: "status",
     dataIndex: "status",
-    render: (text: string) => (
+    render: (text) => (
       <Tag color="volcano" key={text}>
         {text}
       </Tag>
@@ -61,37 +68,51 @@ export const loanColumns = [
   },
 ];
 
-export const voteColumns = [
+export interface VoteColumnsInterface {
+  title: string;
+  dataIndex: string;
+  key: string;
+  render?: (text: number) => JSX.Element;
+}
+export const voteColumns: VoteColumnsInterface[] = [
   {
     title: "Vote",
     dataIndex: "vote",
     key: "vote",
-    render: (text: string) => <Text>{text}</Text>,
+    render: (text) => (
+      <>
+        <Text>{text}</Text>
+      </>
+    ),
   },
   {
     title: "Staked",
     key: "staked",
     dataIndex: "staked",
-    render: (text: number) => <Text>{text.toFixed(2)} TRU</Text>,
+    render: (text) => <Text>{text.toFixed(2)} TRU</Text>,
   },
   {
     title: "Voter",
     key: "voter",
     dataIndex: "voter",
-    render: (text: string) => (
-      <Link href={"https://etherscan.io/address/" + text} target="_blank">
-        {text}
-      </Link>
+    render: (text) => (
+      <>
+        <Link href={"https://etherscan.io/address/" + text} target="_blank">
+          {text}
+        </Link>
+      </>
     ),
   },
   {
     title: "Loan Token Address",
     key: "loanId",
     dataIndex: "loanId",
-    render: (text: string) => (
-      <Link href={"https://etherscan.io/address/" + text} target="_blank">
-        {text}
-      </Link>
+    render: (text) => (
+      <>
+        <Link href={"https://etherscan.io/address/" + text} target="_blank">
+          {text}
+        </Link>
+      </>
     ),
   },
   {

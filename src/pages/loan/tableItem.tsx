@@ -101,7 +101,16 @@ const Spinner = styled.div`
   }
 `;
 
-const TableItem = (props: any) => {
+interface TableItemProps {
+  title: string;
+  level: any;
+  columns: object[];
+  data: object[];
+  isLoading: boolean;
+  showSpinner: boolean;
+}
+
+const TableItem = (props: TableItemProps) => {
   const { title, level, columns, data, isLoading, showSpinner } = props;
 
   return (
