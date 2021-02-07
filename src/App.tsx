@@ -1,24 +1,26 @@
-import React from 'react';
-import {Typography, Tabs, Layout} from 'antd';
-import 'antd/dist/antd.css';
+import React from "react";
+import styled from "styled-components";
+import { Typography, Tabs, Layout } from "antd";
+import "antd/dist/antd.css";
+import { LoanPage } from "./pages";
 
-
-import {PoolPage} from './component/poolPage'
-import {LoanPage} from './component/loanPage'
-import {FarmPage} from './component/farmPage'
-import {PricePage} from './component/pricePage'
+import { PoolPage } from "./component/poolPage";
+import { FarmPage } from "./component/farmPage";
+import { PricePage } from "./component/pricePage";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;
 const { Content } = Layout;
 
+const StyledContent = styled(Content)`
+  padding: 25px 25px;
+`;
 
-function App() {
-
-  return (    
-    <Content style={{ padding: '25px 25px' }}>
+const App = () => {
+  return (
+    <StyledContent>
       <Title>TrueFi Info</Title>
-      <Tabs tabPosition='left'>
+      <Tabs tabPosition="left">
         <TabPane tab="Pool Value" key="2">
           <PoolPage />
         </TabPane>
@@ -32,14 +34,8 @@ function App() {
           <PricePage />
         </TabPane>
       </Tabs>
-    </Content>
-      
-  )
-
-}
+    </StyledContent>
+  );
+};
 
 export default App;
-
-
-
-
