@@ -32,3 +32,34 @@ export const fetchFetchApyFailure = (
     message: message,
   };
 };
+
+// Fetch TRU
+export const initFetchTru = (): Types.InitFetchTru => {
+  return {
+    type: ActionTypes.FETCH_TRU_LOADING,
+  };
+};
+
+export const fetchTru = (): Types.FetchTru => {
+  return {
+    type: ActionTypes.FETCH_TRU,
+  };
+};
+
+export const fetchFetchTruSuccess = (
+  data: Types.TruItem
+): Types.FetchTruSuccess => {
+  return {
+    type: ActionTypes.FETCH_TRU_SUCCESS,
+    data: data,
+  };
+};
+
+export const fetchFetchTruFailure = (
+  message: string
+): Types.FetchTruError => {
+  return {
+    type: ActionTypes.FETCH_TRU_ERROR,
+    message: message,
+  };
+};

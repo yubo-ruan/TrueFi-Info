@@ -1,6 +1,6 @@
 import { ActionTypes } from "../actions/types";
 
-// Actions
+// APY Actions
 export interface InitFetchApy {
   type: ActionTypes.FETCH_APY_LOADING;
 }
@@ -20,14 +20,37 @@ export interface FetchApyError {
   message: string;
 }
 
+// TRU Actions
+export interface InitFetchTru {
+  type: ActionTypes.FETCH_TRU_LOADING;
+}
+
+export interface FetchTru {
+  type: ActionTypes.FETCH_TRU;
+}
+
+export interface FetchTruSuccess {
+  type: ActionTypes.FETCH_TRU_SUCCESS;
+  data: TruItem;
+}
+
+export interface FetchTruError {
+  type: ActionTypes.FETCH_TRU_ERROR;
+  message: string;
+}
+
 export type FarmActions =
   | InitFetchApy
   | FetchApy
   | FetchApySuccess
-  | FetchApyError;
+  | FetchApyError 
+  | InitFetchTru
+  | FetchTru
+  | FetchTruSuccess
+  | FetchTruError;
 
 
-// Price item
+// APY item
 export interface ApyItem {
   pool: string;
   dailyRate: number;
@@ -38,6 +61,13 @@ export interface ApyItem {
   totalClaimedRewards: number;
 }
 
+// TRU item
+export interface TruItem {
+  supply: number;
+  burned: number;
+  distributed: number;
+}
+
 // Reducer state
 export interface FarmStore {
   apy: {
@@ -45,11 +75,11 @@ export interface FarmStore {
     error: boolean;
     data: ApyItem[];
   };
-  // tru: {
-  //   status: string;
-  //   error: boolean;
-  //   priceInEth: number;
-  //   priceInUsd: number;
-  //   poolValue: number;
-  // };
+  tru: {
+    status: string;
+    error: boolean;
+    supply: number;
+    burned: number;
+    distributed: number;
+  };
 }

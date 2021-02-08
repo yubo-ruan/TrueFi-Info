@@ -3,7 +3,7 @@ import { takeEvery } from "redux-saga/effects";
 import { getLoanLogs, getLoans } from "./loans.saga";
 import { getVoteLogs, getVotes } from "./votes.saga";
 import { getTfiPrice, getTruPrice } from "./price.saga";
-import { getApy} from "./farm.saga";
+import { getApy, getTru} from "./farm.saga";
 
 export function* watchers() {
   yield takeEvery(ActionTypes.FETCH_LOANS_LOGS, getLoanLogs);
@@ -13,4 +13,5 @@ export function* watchers() {
   yield takeEvery(ActionTypes.FETCH_TFI_PRICE, getTfiPrice);
   yield takeEvery(ActionTypes.FETCH_TRU_PRICE, getTruPrice);
   yield takeEvery(ActionTypes.FETCH_APY, getApy);
+  yield takeEvery(ActionTypes.FETCH_TRU, getTru);
 }
