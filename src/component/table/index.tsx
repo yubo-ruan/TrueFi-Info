@@ -103,7 +103,7 @@ const Spinner = styled.div`
 
 interface TableItemProps {
   title: string;
-  level: any;
+  level?: any;
   columns: object[];
   data: object[];
   isLoading: boolean;
