@@ -5,7 +5,7 @@ import { Store } from "../../reducers";
 import { loanColumns } from "./constants";
 import { fetchLoanLogs, fetchLoans } from "../../actions/loans.action";
 import { isLoading, isLoaded } from "../../helpers/store";
-import TableItem from "./tableItem";
+import { Table } from "../../component";
 
 const Loans = () => {
   const dispatch = useDispatch();
@@ -56,7 +56,7 @@ const Loans = () => {
   }, [startCount, endCount]);
 
   return (
-    <TableItem
+    <Table
       level={4}
       title="Outstanding Loans"
       showSpinner={isLoaded(status) && endCount <= logCount}

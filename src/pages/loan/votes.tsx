@@ -5,7 +5,7 @@ import { Store } from "../../reducers";
 import { voteColumns } from "./constants";
 import { fetchVoteLogs, fetchVotes } from "../../actions/votes.action";
 import { isLoading } from "../../helpers/store";
-import TableItem from "./tableItem";
+import { Table } from "../../component";
 
 const Votes = () => {
   const voteState = useSelector((state: Store) => state.votes);
@@ -28,7 +28,7 @@ const Votes = () => {
   }, [logsData]);
 
   return (
-    <TableItem
+    <Table
       level={4}
       title="Historical Votes"
       showSpinner={isLoading(votes.status)}

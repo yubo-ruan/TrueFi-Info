@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { Store } from "../../reducers";
 import { Row } from "antd";
 import { fetchTfiPrice, fetchTruPrice } from "../../actions/price.action";
-import CardItem from "./cardItem";
+import { Card } from "../../component";
 
 const PricePage = () => {
   const dispatch = useDispatch();
@@ -20,35 +20,35 @@ const PricePage = () => {
 
   return (
     <Row gutter={16}>
-      <CardItem
+      <Card
         title="TRU in USD"
         value={truPrice.priceInUsd}
         precision={3}
         color="#3f8600"
         prefix="$"
       />
-      <CardItem
+      <Card
         title="TRU in ETH"
         value={truPrice.priceInEth}
         precision={6}
         color="#3f8600"
         prefix=""
       />
-      <CardItem
+      <Card
         title="TFI in TUSD"
         value={tfiPrice.price}
         precision={4}
         color="#3f8600"
         prefix="$"
       />
-      <CardItem
+      <Card
         title="Uniswap TUSD/TFI Pool Value"
         value={tfiPrice.poolValue}
         precision={0}
         color="red"
         prefix="$"
       />
-      <CardItem
+      <Card
         title="Uniswap TRU/ETH Pool Value"
         value={truPrice.poolValue}
         precision={0}
