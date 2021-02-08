@@ -2,9 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Typography, Tabs, Layout } from "antd";
 import "antd/dist/antd.css";
-import { LoanPage, PricePage, FarmPage } from "./pages";
-
-import { PoolPage } from "./component/poolPage";
+import { LoanPage, PricePage, FarmPage, PoolPage } from "./pages";
 
 const { TabPane } = Tabs;
 const { Title } = Typography;

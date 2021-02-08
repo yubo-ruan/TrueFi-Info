@@ -1,5 +1,5 @@
 import React, { useEffect} from "react";
-import { Row } from 'antd';
+import { Row, Col } from 'antd';
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { Store } from "../../reducers";
@@ -54,6 +54,7 @@ const FarmPage = () => {
     return(
         <>
             <Row gutter={16}>
+            <Col span={8}>
                 <Card
                     title="TRU Total Supply"
                     value={tru.supply}
@@ -61,6 +62,8 @@ const FarmPage = () => {
                     color=""
                     prefix=""
                 />
+            </Col>
+            <Col span={8}>
                 <Card
                     title="TRU Burned"
                     value={tru.burned}
@@ -68,6 +71,8 @@ const FarmPage = () => {
                     color=""
                     prefix=""
                 />
+            </Col>
+            <Col span={8}>
                 <Card
                     title="TRU Distributed"
                     value={tru.distributed}
@@ -75,6 +80,7 @@ const FarmPage = () => {
                     color=""
                     prefix=""
                 />
+            </Col>
             </Row>
             <Table
                 title=""

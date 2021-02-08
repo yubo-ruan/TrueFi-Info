@@ -1,20 +1,20 @@
 import React from "react";
-import { Statistic, Card, Col } from "antd";
+import { Statistic, Card } from "antd";
 
 interface CardProps {
     title: string;
     value: string | number;
     precision: number;
-    color: string;
-    prefix: string;
+    color?: string;
+    prefix?: string;
+    suffix?: string;
 };
 
 
 const CardItem = (props: CardProps) => {
-  const { title, value, precision, color, prefix } = props;
+  const { title, value, precision, color, prefix, suffix } = props;
 
   return (
-    <Col span={8}>
       <Card>
         <Statistic
           title={title}
@@ -22,9 +22,9 @@ const CardItem = (props: CardProps) => {
           precision={precision}
           valueStyle={{ color: color }}
           prefix={prefix}
+          suffix={suffix}
         />
       </Card>
-    </Col>
   );
 };
 

@@ -4,6 +4,7 @@ import { getLoanLogs, getLoans } from "./loans.saga";
 import { getVoteLogs, getVotes } from "./votes.saga";
 import { getTfiPrice, getTruPrice } from "./price.saga";
 import { getApy, getTru} from "./farm.saga";
+import { getPoolCards } from "./pool.saga";
 
 export function* watchers() {
   yield takeEvery(ActionTypes.FETCH_LOANS_LOGS, getLoanLogs);
@@ -14,4 +15,5 @@ export function* watchers() {
   yield takeEvery(ActionTypes.FETCH_TRU_PRICE, getTruPrice);
   yield takeEvery(ActionTypes.FETCH_APY, getApy);
   yield takeEvery(ActionTypes.FETCH_TRU, getTru);
+  yield takeEvery(ActionTypes.FETCH_POOL_CARDS, getPoolCards);
 }
