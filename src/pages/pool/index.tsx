@@ -1,6 +1,7 @@
 import React from 'react'
 import PoolCards from "./card";
 import ValueChart from "./valueChart";
+import CurveChart from "./curveChart";
 
 const PoolPage = () => {
     
@@ -8,6 +9,7 @@ const PoolPage = () => {
     <>
         <PoolCards />
         <ValueChart />
+        <CurveChart />
     </>);
 };
 

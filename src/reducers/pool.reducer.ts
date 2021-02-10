@@ -1,6 +1,7 @@
 import { ActionTypes } from "../actions/types";
 import { CardActions } from "../types/pool/card.types";
 import { PoolValueChartActions } from "../types/pool/valueChart.types";
+import { PoolCurveChartActions } from "../types/pool/curveChart.types";
 import { PoolStore } from "../types/pool/index.types";
 
 const poolStore = {
@@ -14,12 +15,17 @@ const poolStore = {
     status: ActionTypes.NOT_LOADED,
     error: false,
     data: []
+  },
+  curveChart: {
+    status: ActionTypes.NOT_LOADED,
+    error: false,
+    data: []
   }
 };
 
 export const pool = (
   state: PoolStore = poolStore,
-  action: CardActions | PoolValueChartActions
+  action: CardActions | PoolValueChartActions | PoolCurveChartActions
 ) => {
   switch (action.type) {
     // Pool cards
@@ -87,6 +93,41 @@ export const pool = (
         ...state,
         valueChart: {
           ...state.valueChart,
+          status: ActionTypes.LOADING_FAILED,
+          error: true,
+        },
+      };
+    }
+    
+    // Pool curve chart
+    case ActionTypes.FETCH_POOL_CURVE_CHART_DATA_LOADING: {
+      return {
+        ...state,
+        curveChart: {
+          ...state.curveChart,
+          status: ActionTypes.IS_LOADING,
+          error: false,
+        },
+      };
+    }
+
+    case ActionTypes.FETCH_POOL_CURVE_CHART_DATA_SUCCESS: {
+      return {
+        ...state,
+        curveChart: {
+          ...state.curveChart,
+          status: ActionTypes.LOADED,
+          error: false,
+          data: state.valueChart.data.concat(action.data)
+        },
+      };
+    }
+
+    case ActionTypes.FETCH_POOL_CURVE_CHART_DATA_ERROR: {
+      return {
+        ...state,
+        curveChart: {
+          ...state.curveChart,
           status: ActionTypes.LOADING_FAILED,
           error: true,
         },

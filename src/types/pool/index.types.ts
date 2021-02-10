@@ -1,4 +1,5 @@
 import { PoolChartDataItem } from "./valueChart.types";
+import { PoolCurvedChartDataItem } from "./curveChart.types";
 
 // Reducer state
 export interface PoolStore {
@@ -12,5 +13,10 @@ export interface PoolStore {
       status: string;
       error: boolean;
       data: PoolChartDataItem[];
+    };
+    curveChart: {
+      status: string;
+      error: boolean;
+      data: PoolCurvedChartDataItem[];
     }
   }
