@@ -1,3 +1,5 @@
+import { PoolChartDataItem } from "./valueChart.types";
+
 // Reducer state
 export interface PoolStore {
     card: {
@@ -6,4 +8,9 @@ export interface PoolStore {
       totalSupply: number;
       poolValue: number;
     };
+    valueChart: {
+      status: string;
+      error: boolean;
+      data: PoolChartDataItem[];
+    }
   }
