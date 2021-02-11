@@ -12,6 +12,7 @@ export const PoolPageOld: React.FC = () => {
   const [combinedChart, setCombinedChart] = useState([{TUSD:0, yCRV:0, Loan1:0, Loan2:0, blockNumber:0}])
 
   useEffect(() => {
+    loanTokenBal();
     getTfiTotalSupply().then(res => setTfi(prev => {
       return {...prev, supply: res}
     }))
@@ -21,7 +22,7 @@ export const PoolPageOld: React.FC = () => {
     getPoolChart().then(res => setPoolChart(res))
     getNetCurve().then(res => setCurveChart(res))
     TusdHistoricalBal().then(res => setCombinedChart(res))
-    loanTokenBal();
+    
   }, []);
 
   return(
