@@ -81,8 +81,19 @@ export const getPulled = async () => {
 }
 
 export const getPoolChart = async () => {
-    const array = [...await getPoolJoined(),...await getPoolExited()]
-    return mergeArray(array)
+    // const array = [...await getPoolJoined(),...await getPoolExited()]
+    const loanTokens = await loanTokenFinder()
+    const address = '0x94a86455210db3d49794861579c55b30940111b4';
+    console.log(loanTokens);
+    
+    const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+    const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+    
+    console.log()
+    return mergeArray([...await loanTokenHelper(address),...await eventHelper(loanOutFilter,-1),...await eventHelper(loanInFilter,1)])
+    const array = await eventHelper(loanInFilter,1)
+    console.log(array)
+    return array
 }
 
 export const getNetCurve = async () => {
@@ -156,8 +167,14 @@ export const TusdHistoricalBal = async () => {
 
     const tusdArray = mergeArray([...await eventHelper(tusdOutFilter,-1),...await eventHelper(tusdInFilter,1)])
     const curveArray = mergeArray([...await eventHelper(curveOutFilter,-1),...await eventHelper(curveInFilter,1)])
-    const loan1Array = mergeArray([...await loanTokenHelper(contracts.loan1),...await eventHelper(loan1OutFilter,-1),...await eventHelper(loan1InFilter,1)])
-    const loan2Array = mergeArray([...await loanTokenHelper(contracts.loan2),...await eventHelper(loan2OutFilter,-1),...await eventHelper(loan2InFilter,1)])
+    // let arryIn = await eventHelper(loan1InFilter,1)
+    // const loanContract = new ethers.Contract(contracts.loan1, tusdAbi, wallet) 
+    // const value = await loanContract.totalSupply()/1e18
+    // console.log("arryIn[0]: "+arryIn[0].marginChange)
+    // arryIn[0].marginChange += value
+    // console.log("arryIn[0]: "+arryIn[0].marginChange)
+    const loan1Array = mergeArray([...await eventHelper(loan1OutFilter,-1),...await eventHelper(loan1InFilter,1)])
+    const loan2Array = mergeArray([...await eventHelper(loan2OutFilter,-1),...await eventHelper(loan2InFilter,1)])
     
     const combined = mergeArrayNew([...processArray(tusdArray,'TUSD'),...processArray(curveArray,'yCRV'),...processArray(loan1Array,'Loan1'),...processArray(loan2Array,'Loan2')])
 
@@ -185,36 +202,35 @@ const loanTokenHelper = async(address:string) => {
     const loanContract = new ethers.Contract(address, tusdAbi, wallet) 
     const value = await loanContract.totalSupply()/1e18
     await provider.getLogs({address: contracts.lender, topics:lender.filters.Funded(address).topics, fromBlock: 0, toBlock: "latest"}).then(res => {
-            result.push({total: 0,marginChange: value,blockNumber: res[0]['blockNumber']})
+            result.push({total: 0,marginChange: value,blockNumber:1 })
     })
     return result
 }
 
 
-// export const loanTokenFinder = async() => {
-//     let result:string[] = []
+export const loanTokenFinder = async() => {
+    let result:string[] = []
     
-//     await provider.getLogs({address: contracts.loanFactory, topics:lender.filters.LoanTokenCreated().topics, fromBlock: 0, toBlock: "latest"}).then(res => {
-//         res.map(res => {
-//             const addr = '0x'+res['data'].substr(2+24,40)
-//             result.push(addr)
-//         })
-//     })
-//     return result
-// }
+    await provider.getLogs({address: contracts.loanFactory, topics:lender.filters.LoanTokenCreated().topics, fromBlock: 0, toBlock: "latest"}).then(res => {
+        res.map(res => {
+            const addr = '0x'+res['data'].substr(2+24,40)
+            result.push(addr)
+        })
+    })
+    return result
+}
 
-// export const loanTokenBal = async() => {
-//     let loanTokenArray: { [x: number]: any; blockNumber: any }[] = []
-//     const loanTokens = await loanTokenFinder()
-//     loanTokens.map(async (address,index) => {
-//         const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
-//         const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
-//         const loanArray = mergeArray([...await loanTokenHelper(address),...await eventHelper(loanOutFilter,-1),...await eventHelper(loanInFilter,1)])
-//         loanArray.map(res => {
-//             const result = {[index]:res.total,
-//             blockNumber: res.blockNumber}
-//             loanTokenArray.push(result)
-//         })
-//     })
-//     return loanTokenArray
-// }
+export const loanTokenBal = async() => {
+    
+    const loanTokens = await loanTokenFinder()
+    loanTokens.map(async (address,index) => {
+        const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+        const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+        const array = [...await loanTokenHelper(address),...await eventHelper(loanOutFilter,-1),...await eventHelper(loanInFilter,1)]
+        mergeArray(array)
+        
+    })
+
+    
+    
+}
