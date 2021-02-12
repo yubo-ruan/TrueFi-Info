@@ -6,7 +6,7 @@ import { Store } from "../../reducers";
 import { fetchPoolCurveChartData } from "../../actions/pool/curveChart.action";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typography } from 'antd';
-import { GraphLoader } from "../../component";
+import { GraphLoader, CustomTooltip } from "../../component";
 import { isLoading } from "../../helpers/store"; 
 
 const { Title } = Typography;
@@ -40,7 +40,7 @@ const CurveChart = () => {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="blockNumber" />
                 <YAxis type="number" tickMargin={10} />
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 <Line type="monotone" dataKey="total" stroke="#8884d8" />
                 <Line type="monotone" dataKey="marginChange" stroke="#82ca9d" />

@@ -45,6 +45,8 @@ const getEventsHelper = async (topic:string,index:number) => {
     return result
 }
 const mergeArray = (array: any[]) => {
+    // console.log("incoming array", array);
+    
     
     array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
     for(let i=1;i<array.length;i++){
@@ -53,7 +55,10 @@ const mergeArray = (array: any[]) => {
             array.splice(i-1,1)
             i--
         }
+        
     }
+    // console.log("ARRAY", array);
+    
     return array
 }
 
@@ -110,39 +115,66 @@ export const getCombined = async () => {
 
 
 const processArray = (array: any[], name: string) => {
+    // console.log("processArray", array);
+    
     let newArray = []
     for(let i=1;i<array.length;i++){
-        newArray.push({data:{name:name,balance:array[i].total.toFixed(0)},blockNumber:array[i].blockNumber})
+        newArray.push({
+            data:{
+                name:name,
+                balance:array[i].total.toFixed(0),
+                timestamp: array[i].timestamp
+            },
+            blockNumber:array[i].blockNumber
+        })
     }
     return newArray
+}
+
+const processArray2 = (array: any[], name: string) => {
+    // console.log("processArray", array);
+    
+    let newArray = []
+    for(let i=1;i<array.length;i++){
+        for(let j = 1; j < array[i].length; j++) {
+            newArray.push({data:{
+                name:name,
+                timestamp: array[i][j].timestamp,
+                balance:array[i][j].total.toFixed(0)},
+                blockNumber:array[i][j].blockNumber,
+                timestamp: array[i][j].timestamp
+            })
+        }
+    }
+    return newArray;
 }
 
 const mergeArrayNew = (array: any[]) => {
     let newArray:any = []
     array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
     if(array[0].data.name === 'TUSD'){
-        newArray[0] = {TUSD:array[0].data.balance,yCRV:0,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber}
+        newArray[0] = {TUSD:array[0].data.balance,yCRV:0,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
     }else if(array[0].data.name === 'yCRV'){
-        newArray[0] = {TUSD:0,yCRV:array[0].data.balance,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber}
+        newArray[0] = {TUSD:0,yCRV:array[0].data.balance,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
     }else if(array[0].data.name === 'Loan1'){
-        newArray[0] = {TUSD:0,yCRV:0,Loan1:array[0].data.balance,Loan2:0,blockNumber:array[0].blockNumber}
+        newArray[0] = {TUSD:0,yCRV:0,Loan1:array[0].data.balance,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
     }
     else{
-        newArray[0] = {TUSD:0,yCRV:0,Loan1:0,Loan2:array[0].data.balance,blockNumber:array[0].blockNumber}
+        newArray[0] = {TUSD:0,yCRV:0,Loan1:0,Loan2:array[0].data.balance,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
     }
     
     for(let i=1;i<array.length;i++){
         if(array[i].data.name === 'TUSD'){
-            newArray.push({TUSD:array[i].data.balance,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber})
+            newArray.push({TUSD:array[i].data.balance,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
         }
         if(array[i].data.name === 'yCRV'){
-            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:array[i].data.balance,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber})
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:array[i].data.balance,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
         }
         if(array[i].data.name === 'Loan1'){
-            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:array[i].data.balance,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber})
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:array[i].data.balance,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
         }
         if(array[i].data.name === 'Loan2'){
-            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:array[i].data.balance,blockNumber:array[i].blockNumber})
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:array[i].data.balance,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
         }
     }
     
@@ -158,50 +190,78 @@ export const TusdHistoricalBal = async () => {
     const curveOutFilter = {address: contracts.curveGauge, topics:curveGauge.filters.Withdraw(contracts.tfi).topics, fromBlock: 0, toBlock: "latest"}    
     const curveInFilter = {address: contracts.curveGauge, topics:curveGauge.filters.Deposit(contracts.tfi).topics, fromBlock: 0, toBlock: "latest"}
 
-    const loan1OutFilter = {address: contracts.loan1, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
-    const loan1InFilter = {address: contracts.loan1, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+    // const loan1OutFilter = {address: contracts.loan1, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+    // const loan1InFilter = {address: contracts.loan1, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+    // console.log("loan1InFilter", loan1InFilter);
+    
+    // here we pass "loan1"(new ethers.Contract(contracts.loan1, tusdAbi, wallet)) as argument & in loanTokenBal we use it on topics
+    const loan11 = await loanTokenBal(); 
+    // const loan21 = await loanTokenBal(); 
+    console.log("loan1InFilter", loan11);
+    // console.log("loan11InFilter", loan11InFilter);
 
-    const loan2OutFilter = {address: contracts.loan2, topics:loan2.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
-    const loan2InFilter = {address: contracts.loan2, topics:loan2.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+    // const loan2OutFilter = {address: contracts.loan2, topics:loan2.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
+    // const loan2InFilter = {address: contracts.loan2, topics:loan2.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
 
     const tusdArray = mergeArray([...await eventHelper(tusdOutFilter,-1),...await eventHelper(tusdInFilter,1)])
     const curveArray = mergeArray([...await eventHelper(curveOutFilter,-1),...await eventHelper(curveInFilter,1)])
-    // let arryIn = await eventHelper(loan1InFilter,1)
-    // const loanContract = new ethers.Contract(contracts.loan1, tusdAbi, wallet) 
-    // const value = await loanContract.totalSupply()/1e18
-    // console.log("arryIn[0]: "+arryIn[0].marginChange)
-    // arryIn[0].marginChange += value
-    // console.log("arryIn[0]: "+arryIn[0].marginChange)
-    const loan1Array = mergeArray([...await eventHelper(loan1OutFilter,-1),...await eventHelper(loan1InFilter,1)])
-    const loan2Array = mergeArray([...await eventHelper(loan2OutFilter,-1),...await eventHelper(loan2InFilter,1)])
-    
-    const combined = mergeArrayNew([...processArray(tusdArray,'TUSD'),...processArray(curveArray,'yCRV'),...processArray(loan1Array,'Loan1'),...processArray(loan2Array,'Loan2')])
 
+
+    // const loan1Array = mergeArray([...await eventHelper(loan1OutFilter,-1),...await eventHelper(loan1InFilter,1)])
+    // console.log("final loan1InFilter", await eventHelper(loan1InFilter,1));
+    
+    // const loan2Array = mergeArray([...await eventHelper(loan2OutFilter,-1),...await eventHelper(loan2InFilter,1)])
+    
+    const combined = mergeArrayNew([
+        ...processArray(tusdArray,'TUSD'),
+        ...processArray(curveArray,'yCRV'),
+        ...processArray2(loan11,'Loan1'),
+        // ...processArray2(loan21,'Loan2')
+    ])
+
+    // console.log("combined", combined);
+    
 
     return combined
 }
 
 const eventHelper = async (filter: ethers.providers.Filter, sign:number) => {
-    let result: { total: number; marginChange: number; blockNumber: number }[] = []
-    await provider.getLogs(filter).then(res => {
+    let result: {
+         total: number; 
+         marginChange: number;
+        blockNumber: number;
+        timestamp: number;
+         }[] = [];
+
+    await provider.getLogs(filter).then(async res => {
         for(let i=0;i<res.length;i++){
             const value = parseInt(res[i]['data'].substr(2,64),16)/1e18
-            result.push({total: 0,
-                        marginChange: value*sign,
-                        blockNumber: res[i]['blockNumber']})
-        }
-    })
-    
+            result.push({
+                total: 0,
+                marginChange: value*sign,
+                blockNumber: res[i]['blockNumber'],
+                // timestamp: await timeStamp(res[i].blockHash),
+                timestamp: 1613064392
+            });
+            }
+        })
+        // console.log("result", result);
+        
     return result
+}
+
+const timeStamp = async(blockHash:string) => {
+ let data = await provider.getBlock(blockHash);
+ return data.timestamp;
 }
 
 const loanTokenHelper = async(address:string) => {
 
-    let result: { total: number; marginChange: number; blockNumber: number }[] = []
+    let result: { total: number; marginChange: number; blockNumber: number, timestamp: number; }[] = []
     const loanContract = new ethers.Contract(address, tusdAbi, wallet) 
     const value = await loanContract.totalSupply()/1e18
     await provider.getLogs({address: contracts.lender, topics:lender.filters.Funded(address).topics, fromBlock: 0, toBlock: "latest"}).then(res => {
-            result.push({total: 0,marginChange: value,blockNumber:1 })
+            result.push({total: 0,marginChange: value,blockNumber:1, timestamp: 1613064392 })
     })
     return result
 }
@@ -211,7 +271,7 @@ export const loanTokenFinder = async() => {
     let result:string[] = []
     
     await provider.getLogs({address: contracts.loanFactory, topics:lender.filters.LoanTokenCreated().topics, fromBlock: 0, toBlock: "latest"}).then(res => {
-        res.map(res => {
+        res.forEach(res => {            
             const addr = '0x'+res['data'].substr(2+24,40)
             result.push(addr)
         })
@@ -220,19 +280,45 @@ export const loanTokenFinder = async() => {
 }
 
 export const loanTokenBal = async() => {
-    let loanTokenArray: { [x: number]: any; blockNumber: any }[] = []
-    const loanTokens = await loanTokenFinder()
-    loanTokens.map(async (address,index) => {
+    let loanTokenArray: { [x: number]: any; blockNumber: any; }[] = []
+    const loanTokens = await loanTokenFinder();    // all loan token address 0x12ee3
+    
+    let data = await Promise.all(loanTokens.map(async (address,index) => {
+
+        // All the topics are same > so loan1
         const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
         const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
-        const loanArray = mergeArray([...await loanTokenHelper(address),...await eventHelper(loanOutFilter,-1),...await eventHelper(loanInFilter,1)])
-        loanArray.map(res => {
-            const result = {[index]:res.total,
-            blockNumber: res.blockNumber}
-            console.log(loanTokenArray)
-            loanTokenArray.push(result)
-        })
+        let arr1 = await loanTokenHelper(address);
+        let arr2 = await eventHelper(loanOutFilter,-1);
+        let arr3 = await eventHelper(loanInFilter,1);
+        console.log("arr1", arr1);
+        console.log("arr2", arr2);
+        console.log("arr3", arr3);
         
-    })
-    return loanTokenArray
+
+        let loanArray: any;
+        if(arr1.length > 0 && arr2.length > 0 && arr3.length > 0) {
+            loanArray = mergeArray([...arr1,...arr2,...arr3]);        
+        }
+        // console.log("302 loanArray", loanArray);
+        
+        
+        if(loanArray !== undefined && loanArray.length > 0) {
+            loanArray.forEach((res: { total: any; blockNumber: any, timestamp: number; }) => {                
+                const result = {
+                    // [index]:res.total, //
+                    total:res.total,
+                    blockNumber: res.blockNumber,
+                    timestamp: res.timestamp
+                };
+                loanTokenArray.push(result)
+            });
+        }
+
+        // console.log("317 loanTokenArray", loanTokenArray);
+        
+        return loanTokenArray;
+    }));
+
+    return data;
 }

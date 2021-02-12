@@ -6,7 +6,7 @@ import { Store } from "../../reducers";
 import { fetchPoolValueChartData } from "../../actions/pool/valueChart.action";
 import { Area, ComposedChart, XAxis, YAxis, Bar, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typography} from 'antd';
-import { GraphLoader } from "../../component";
+import { GraphLoader, CustomTooltip } from "../../component";
 import { isLoading } from "../../helpers/store"; 
 
 const { Title } = Typography;
@@ -40,7 +40,7 @@ const ValueChart = () => {
                     <CartesianGrid stroke="#f5f5f5" />
                     <XAxis dataKey="blockNumber" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip content={<CustomTooltip />} />
                     <Legend />
                     <Area type="monotone" dataKey="total" fill="#ffc658" stroke="#8884d8" />
                     <Bar dataKey="marginChange" barSize={20} fill="#413ea0" />
