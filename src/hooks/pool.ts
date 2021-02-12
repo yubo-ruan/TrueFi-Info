@@ -151,6 +151,7 @@ const processArray2 = (array: any[], name: string) => {
 
 const mergeArrayNew = (array: any[]) => {
     let newArray:any = []
+    // console.log(array)
     array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
     if(array[0].data.name === 'TUSD'){
         newArray[0] = {TUSD:array[0].data.balance,yCRV:0,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
@@ -197,7 +198,7 @@ export const TusdHistoricalBal = async () => {
     // here we pass "loan1"(new ethers.Contract(contracts.loan1, tusdAbi, wallet)) as argument & in loanTokenBal we use it on topics
     const loan11 = await loanTokenBal(); 
     // const loan21 = await loanTokenBal(); 
-    console.log("loan1InFilter", loan11);
+    // console.log("loan1InFilter", loan11);
     // console.log("loan11InFilter", loan11InFilter);
 
     // const loan2OutFilter = {address: contracts.loan2, topics:loan2.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
@@ -215,7 +216,7 @@ export const TusdHistoricalBal = async () => {
     const combined = mergeArrayNew([
         ...processArray(tusdArray,'TUSD'),
         ...processArray(curveArray,'yCRV'),
-        ...processArray2(loan11,'Loan1'),
+        // ...processArray2(loan11,'Loan1'),
         // ...processArray2(loan21,'Loan2')
     ])
 
@@ -282,8 +283,9 @@ export const loanTokenFinder = async() => {
 export const loanTokenBal = async() => {
     let loanTokenArray: { [x: number]: any; blockNumber: any; }[] = []
     const loanTokens = await loanTokenFinder();    // all loan token address 0x12ee3
-    
-    let data = await Promise.all(loanTokens.map(async (address,index) => {
+    let newArray:any[];
+
+    let data = await Promise.all(loanTokens.slice(0,2).map(async (address,index) => {
 
         // All the topics are same > so loan1
         const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
@@ -291,28 +293,31 @@ export const loanTokenBal = async() => {
         let arr1 = await loanTokenHelper(address);
         let arr2 = await eventHelper(loanOutFilter,-1);
         let arr3 = await eventHelper(loanInFilter,1);
-        console.log("arr1", arr1);
-        console.log("arr2", arr2);
-        console.log("arr3", arr3);
+        // console.log("arr1", arr1);
+        // console.log("arr2", arr2);
+        // console.log("arr3", arr3);
         
 
         let loanArray: any;
+        
         if(arr1.length > 0 && arr2.length > 0 && arr3.length > 0) {
             loanArray = mergeArray([...arr1,...arr2,...arr3]);        
         }
-        // console.log("302 loanArray", loanArray);
         
-        
-        if(loanArray !== undefined && loanArray.length > 0) {
-            loanArray.forEach((res: { total: any; blockNumber: any, timestamp: number; }) => {                
-                const result = {
-                    // [index]:res.total, //
-                    total:res.total,
-                    blockNumber: res.blockNumber,
-                    timestamp: res.timestamp
-                };
-                loanTokenArray.push(result)
-            });
+        if(loanArray !== undefined && loanArray.length > 0) {    
+            console.log(loanArray);      
+            for(let i=1;i<loanArray.length;i++){
+                newArray.push({
+                    data:{
+                        name:`Loan${index}`,
+                        balance:loanArray[i].total.toFixed(0)
+                        // timestamp: loanArray[i].timestamp
+                    },
+                    blockNumber:loanArray[i].blockNumber
+                })
+            }    
+            mergeArrayNew2(newArray)
+
         }
 
         // console.log("317 loanTokenArray", loanTokenArray);
@@ -321,4 +326,30 @@ export const loanTokenBal = async() => {
     }));
 
     return data;
+}
+
+
+const mergeArrayNew2 = (array: any[]) => {
+    let newArray:any = []
+    console.log(array)
+    array.sort((a,b) => {
+
+        //[{}{}{}{}{}{}{}{}]
+        // console.log("a,b",a,b)
+        return (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)
+    
+    }); 
+
+    //[{}{}{}{}{}{}{}{}] --> sorted
+    for(let i=0;i<array.length;i++){
+
+        // newArray.push({[array[i].data.name]:array[i].data.balance,   //loan12
+        //                 'Loan1':array[i].data.balance,
+        //                 'Loan5':array[i].data.balance,
+        //                 ......
+        //                 blockNumber:array[i].data.balance})
+        // console.log(array[i])
+    }
+    
+    
 }

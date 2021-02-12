@@ -25,7 +25,7 @@ export const PoolPageOld: React.FC = () => {
     getPoolChart().then(res => setPoolChart(res))
     getNetCurve().then(res => setCurveChart(res))
     TusdHistoricalBal().then(res => {
-      console.log("result in pool", res);
+      //console.log("result in pool", res);
        
       setCombinedChart(res)
     })
