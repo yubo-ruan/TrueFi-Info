@@ -23,8 +23,6 @@ const CustomTooltip = (props: TooltipProps) => {
         <Wrapper>
             <Text>{`${label}`}</Text>
             {payload && payload.length > 0 && payload.map((item: any, index: number) => {
-                console.log("value", item.value.toLocaleString());
-                
                 return <Text color={item.color} key={`tooltip_${index}`}>
                     {item.name}: {(item.name === "total" || item.name === "marginChange") && "$"}
                     {Number(item.value).toLocaleString()}
