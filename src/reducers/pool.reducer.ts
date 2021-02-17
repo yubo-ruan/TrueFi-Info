@@ -2,6 +2,7 @@ import { ActionTypes } from "../actions/types";
 import { CardActions } from "../types/pool/card.types";
 import { PoolValueChartActions } from "../types/pool/valueChart.types";
 import { PoolCurveChartActions } from "../types/pool/curveChart.types";
+import { PoolCompositionChartActions } from './../types/pool/compositionChart.types';
 import { PoolStore } from "../types/pool/index.types";
 
 const poolStore = {
@@ -20,12 +21,18 @@ const poolStore = {
     status: ActionTypes.NOT_LOADED,
     error: false,
     data: []
+  },
+  compositionChart: {
+    status: ActionTypes.NOT_LOADED,
+    error: false,
+    data: [],
+    loanTokenSet: []
   }
 };
 
 export const pool = (
   state: PoolStore = poolStore,
-  action: CardActions | PoolValueChartActions | PoolCurveChartActions
+  action: CardActions | PoolValueChartActions | PoolCurveChartActions | PoolCompositionChartActions
 ) => {
   switch (action.type) {
     // Pool cards
@@ -63,7 +70,7 @@ export const pool = (
         },
       };
     }
-    
+
     // Pool value chart
     case ActionTypes.FETCH_POOL_VALUE_CHART_DATA_LOADING: {
       return {
@@ -98,7 +105,7 @@ export const pool = (
         },
       };
     }
-    
+
     // Pool curve chart
     case ActionTypes.FETCH_POOL_CURVE_CHART_DATA_LOADING: {
       return {
@@ -128,6 +135,42 @@ export const pool = (
         ...state,
         curveChart: {
           ...state.curveChart,
+          status: ActionTypes.LOADING_FAILED,
+          error: true,
+        },
+      };
+    }
+
+    // Pool composition chart
+    case ActionTypes.FETCH_POOL_COMPOSITION_CHART_DATA_LOADING: {
+      return {
+        ...state,
+        compositionChart: {
+          ...state.compositionChart,
+          status: ActionTypes.IS_LOADING,
+          error: false,
+        },
+      };
+    }
+
+    case ActionTypes.FETCH_POOL_COMPOSITION_CHART_DATA_SUCCESS: {
+      return {
+        ...state,
+        compositionChart: {
+          ...state.compositionChart,
+          status: ActionTypes.LOADED,
+          error: false,
+          data: state.compositionChart.data.concat(action.data),
+          loanTokenSet: state.compositionChart.loanTokenSet.concat(action.loanTokens),
+        },
+      };
+    }
+
+    case ActionTypes.FETCH_POOL_COMPOSITION_CHART_DATA_ERROR: {
+      return {
+        ...state,
+        compositionChart: {
+          ...state.compositionChart,
           status: ActionTypes.LOADING_FAILED,
           error: true,
         },

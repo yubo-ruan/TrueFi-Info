@@ -3,6 +3,7 @@ import { put } from "redux-saga/effects";
 import * as cardActions from "../actions/pool/card.action";
 import * as valueChartActions from "../actions/pool/valueChart.action";
 import * as curveChartActions from "../actions/pool/curveChart.action";
+import * as compositionChartActions from "../actions/pool/compositionChart.action";
 
 // Pool cards
 export function* getPoolCards() {
@@ -46,5 +47,19 @@ export function* getPoolCurveChartData() {
     yield put(curveChartActions.fetchPoolCurveChartDataSuccess(response.data.data));
   } catch (error) {
     yield put(curveChartActions.fetchFetchPoolCurveChartDataFailure(error.message));
+  }
+}
+// Pool composition chart
+export function* getPoolCompositionChartData() {
+  yield put(compositionChartActions.initFetchPoolCompositionChartData());
+
+  try {
+    const response = yield axios.get(
+      `${process.env.REACT_APP_SERVER_URL}/pool-composition-chart`
+    );
+
+    yield put(compositionChartActions.fetchPoolCompositionChartDataSuccess(response.data.data, response.data.loanTokenNameSet));
+  } catch (error) {
+    yield put(compositionChartActions.fetchFetchPoolCompositionChartDataFailure(error.message));
   }
 }
