@@ -12,10 +12,10 @@ export const PoolPageOld: React.FC = () => {
   const [tfi, setTfi] = useState({supply: 0, poolValue: 0})
   const [poolChart, setPoolChart] = useState([{total:0, marginChange:0, blockNumber:0}])
   const [curveChart, setCurveChart] = useState([{total:0, marginChange:0, blockNumber:0}])
-  const [combinedChart, setCombinedChart] = useState([{TUSD:0, yCRV:0, Loan1:0, Loan2:0, blockNumber:0}])
+  const [combinedChart, setCombinedChart] = useState([{'Loan1':0, blockNumber:0}])
+  const [loanTokenNameSet, setLoanTokenNameSet] = useState(new Set())
 
   useEffect(() => {
-    // loanTokenBal().then(res => console.log("result", res));
     getTfiTotalSupply().then(res => setTfi(prev => {
       return {...prev, supply: res}
     }))
@@ -24,11 +24,13 @@ export const PoolPageOld: React.FC = () => {
     }))
     getPoolChart().then(res => setPoolChart(res))
     getNetCurve().then(res => setCurveChart(res))
-    TusdHistoricalBal().then(res => {
-      //console.log("result in pool", res);
-       
-      setCombinedChart(res)
+    loanTokenBal().then((res) => {       
+      setCombinedChart(res.data)
+      setLoanTokenNameSet(res.loanTokenNameSet)
+      console.log(res.loanTokenNameSet)
+      console.log(res.data)
     })
+
     
   }, []);
 
@@ -68,11 +70,14 @@ export const PoolPageOld: React.FC = () => {
         <YAxis type="number" tickMargin={10} />
         <Tooltip content={<CustomTooltip />} />
         <Legend />
-        <Area type="monotone" dataKey="TUSD" stackId="1" stroke="#8884d8" fill="#8884d8" />
-        <Area type="monotone" dataKey="yCRV" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
-        <Area type="monotone" dataKey="Loan1" stackId="1" stroke="#ffc658" fill="#ffc658" />
-        <Area type="monotone" dataKey="Loan2" stackId="1" stroke="#ffc658" fill="#ffc658" />
+        {Array.from(loanTokenNameSet).map(data => {
+          return (
+            <Area type="monotone" dataKey={`Loan${data}`} stackId="1" stroke="#8884d8" fill="#8884d8" />
+          )
+        })}
       </AreaChart>
+
+      
       <Title level={2}>Pool Interaction with Curve.fi</Title>
       <LineChart width={1000} height={300} data={curveChart} margin={{top: 30, right: 30, left: 30, bottom: 30,}}>
         <CartesianGrid strokeDasharray="3 3" />
@@ -86,4 +91,5 @@ export const PoolPageOld: React.FC = () => {
     </div>
   )
 };
+
 

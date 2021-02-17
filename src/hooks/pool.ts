@@ -122,7 +122,7 @@ const processArray = (array: any[], name: string) => {
         newArray.push({
             data:{
                 name:name,
-                balance:array[i].total.toFixed(0),
+                balance:array[i].total.toFixed(2),
                 timestamp: array[i].timestamp
             },
             blockNumber:array[i].blockNumber
@@ -147,39 +147,6 @@ const processArray2 = (array: any[], name: string) => {
         }
     }
     return newArray;
-}
-
-const mergeArrayNew = (array: any[]) => {
-    let newArray:any = []
-    // console.log(array)
-    array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
-    if(array[0].data.name === 'TUSD'){
-        newArray[0] = {TUSD:array[0].data.balance,yCRV:0,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
-    }else if(array[0].data.name === 'yCRV'){
-        newArray[0] = {TUSD:0,yCRV:array[0].data.balance,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
-    }else if(array[0].data.name === 'Loan1'){
-        newArray[0] = {TUSD:0,yCRV:0,Loan1:array[0].data.balance,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
-    }
-    else{
-        newArray[0] = {TUSD:0,yCRV:0,Loan1:0,Loan2:array[0].data.balance,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
-    }
-    
-    for(let i=1;i<array.length;i++){
-        if(array[i].data.name === 'TUSD'){
-            newArray.push({TUSD:array[i].data.balance,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
-        }
-        if(array[i].data.name === 'yCRV'){
-            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:array[i].data.balance,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
-        }
-        if(array[i].data.name === 'Loan1'){
-            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:array[i].data.balance,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
-        }
-        if(array[i].data.name === 'Loan2'){
-            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:array[i].data.balance,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
-        }
-    }
-    
-    return newArray
 }
 
 export const TusdHistoricalBal = async () => {
@@ -281,75 +248,106 @@ export const loanTokenFinder = async() => {
 }
 
 export const loanTokenBal = async() => {
-    let loanTokenArray: { [x: number]: any; blockNumber: any; }[] = []
     const loanTokens = await loanTokenFinder();    // all loan token address 0x12ee3
-    let newArray:any[];
+    let totalLoanHistoricalBal:any[] = [];
+    let loanTokenNameSet:Set<number> = new Set()
 
-    let data = await Promise.all(loanTokens.slice(0,2).map(async (address,index) => {
-
-        // All the topics are same > so loan1
-        const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 0, toBlock: "latest"}    
-        const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 0, toBlock: "latest"}
+    await Promise.all(loanTokens.map(async (address,index) => {
+        let singleLoanHistoricalBal: any = [];
+        
+        const loanOutFilter = {address: address, topics:loan1.filters.Transfer(contracts.lender).topics, fromBlock: 11280398, toBlock: "latest"}    
+        const loanInFilter = {address: address, topics:loan1.filters.Transfer(null,contracts.lender).topics, fromBlock: 11280398, toBlock: "latest"}
         let arr1 = await loanTokenHelper(address);
         let arr2 = await eventHelper(loanOutFilter,-1);
         let arr3 = await eventHelper(loanInFilter,1);
-        // console.log("arr1", arr1);
-        // console.log("arr2", arr2);
-        // console.log("arr3", arr3);
-        
 
-        let loanArray: any;
-        
         if(arr1.length > 0 && arr2.length > 0 && arr3.length > 0) {
-            loanArray = mergeArray([...arr1,...arr2,...arr3]);        
-        }
-        
-        if(loanArray !== undefined && loanArray.length > 0) {    
-            console.log(loanArray);      
-            for(let i=1;i<loanArray.length;i++){
-                newArray.push({
+            loanTokenNameSet.add(index)
+            singleLoanHistoricalBal = mergeArray([...arr1,...arr2,...arr3]);        
+            for(let i=0;i<singleLoanHistoricalBal.length;i++){
+                const loanTokenName = `Loan${index}`
+                totalLoanHistoricalBal.push({
                     data:{
-                        name:`Loan${index}`,
-                        balance:loanArray[i].total.toFixed(0)
+                        name:loanTokenName,
+                        balance:singleLoanHistoricalBal[i].total
                         // timestamp: loanArray[i].timestamp
                     },
-                    blockNumber:loanArray[i].blockNumber
+                    blockNumber:singleLoanHistoricalBal[i].blockNumber
                 })
-            }    
-            mergeArrayNew2(newArray)
-
+            }   
         }
+        console.log("Loan"+index+"    "+"Address: "+address)
+        console.log(singleLoanHistoricalBal)
+        // ALL CORRECT ABOVE
 
-        // console.log("317 loanTokenArray", loanTokenArray);
-        
-        return loanTokenArray;
+             
     }));
-
-    return data;
+    return {    
+                data: mergeArrayNew2(totalLoanHistoricalBal,loanTokenNameSet),
+                loanTokenNameSet: loanTokenNameSet
+            }
 }
 
 
-const mergeArrayNew2 = (array: any[]) => {
+const mergeArrayNew2 = (array: any[], loanTokenNameSet: any[] | Set<unknown>) => {
     let newArray:any = []
-    console.log(array)
-    array.sort((a,b) => {
-
-        //[{}{}{}{}{}{}{}{}]
-        // console.log("a,b",a,b)
-        return (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)
     
+    array.sort((a,b) => {
+        return (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)
     }); 
 
-    //[{}{}{}{}{}{}{}{}] --> sorted
-    for(let i=0;i<array.length;i++){
+    const obj = {[array[0].data.name]:array[0].data.balance,blockNumber:array[0].blockNumber}
+        loanTokenNameSet.forEach((name: any) => {
+            name = "Loan"+name
+            if(name != array[0].data.name){
+                obj[name] = 0
+            }
+        })
+    newArray.push(obj)
 
-        // newArray.push({[array[i].data.name]:array[i].data.balance,   //loan12
-        //                 'Loan1':array[i].data.balance,
-        //                 'Loan5':array[i].data.balance,
-        //                 ......
-        //                 blockNumber:array[i].data.balance})
-        // console.log(array[i])
+
+    for(let i=1;i<array.length;i++){
+        const obj = {[array[i].data.name]:array[i].data.balance,blockNumber:array[i].blockNumber}
+        loanTokenNameSet.forEach((name: any) => {
+            name = "Loan"+name
+            if(name != array[i].data.name){
+                obj[name] = newArray[i-1][name]
+            }
+        })
+        newArray.push(obj)
+    }
+    return newArray
+}
+
+
+const mergeArrayNew = (array: any[]) => {
+    let newArray:any = []
+    array.sort((a,b) => (a.blockNumber > b.blockNumber) ? 1 : ((b.blockNumber > a.blockNumber) ? -1 : 0)); 
+    if(array[0].data.name === 'TUSD'){
+        newArray[0] = {TUSD:array[0].data.balance,yCRV:0,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
+    }else if(array[0].data.name === 'yCRV'){
+        newArray[0] = {TUSD:0,yCRV:array[0].data.balance,Loan1:0,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
+    }else if(array[0].data.name === 'Loan1'){
+        newArray[0] = {TUSD:0,yCRV:0,Loan1:array[0].data.balance,Loan2:0,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
+    }
+    else{
+        newArray[0] = {TUSD:0,yCRV:0,Loan1:0,Loan2:array[0].data.balance,blockNumber:array[0].blockNumber, timestamp: array[0].data.timestamp}
     }
     
+    for(let i=1;i<array.length;i++){
+        if(array[i].data.name === 'TUSD'){
+            newArray.push({TUSD:array[i].data.balance,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
+        }
+        if(array[i].data.name === 'yCRV'){
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:array[i].data.balance,Loan1:newArray[i-1].Loan1,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
+        }
+        if(array[i].data.name === 'Loan1'){
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:array[i].data.balance,Loan2:newArray[i-1].Loan2,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
+        }
+        if(array[i].data.name === 'Loan2'){
+            newArray.push({TUSD:newArray[i-1].TUSD,yCRV:newArray[i-1].yCRV,Loan1:newArray[i-1].Loan1,Loan2:array[i].data.balance,blockNumber:array[i].blockNumber, timestamp: array[i].data.timestamp})
+        }
+    }
     
+    return newArray
 }
