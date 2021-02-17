@@ -1,40 +1,43 @@
 import React, { useState, useEffect } from 'react'
-import { Statistic, Card, Row, Col, Typography} from 'antd'
-import {getTfiTotalSupply, getPoolValue, getPoolChart, getNetCurve, TusdHistoricalBal, loanTokenBal} from '../hooks/pool'
-import {LineChart, Area, AreaChart, ComposedChart, Line, XAxis, YAxis, Bar, CartesianGrid, Tooltip, Legend} from 'recharts'
-import {CustomTick, CustomTooltip} from "./index";
+import { Statistic, Card, Row, Col, Typography } from 'antd'
+import { getTfiTotalSupply, getPoolValue, getPoolChart, getNetCurve, TusdHistoricalBal, loanTokenBal } from '../hooks/pool'
+import { LineChart, Area, AreaChart, ComposedChart, Line, XAxis, YAxis, Bar, CartesianGrid, Tooltip, Legend } from 'recharts'
+import { CustomTick, CustomTooltip } from "./index";
 
 const { Title } = Typography;
 
 
 export const PoolPageOld: React.FC = () => {
-  
-  const [tfi, setTfi] = useState({supply: 0, poolValue: 0})
-  const [poolChart, setPoolChart] = useState([{total:0, marginChange:0, blockNumber:0}])
-  const [curveChart, setCurveChart] = useState([{total:0, marginChange:0, blockNumber:0}])
-  const [combinedChart, setCombinedChart] = useState([{'Loan1':0, blockNumber:0}])
+
+  const colors = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4", "#f032e6", "#bfef45", "#fabed4",
+    "#469990", "#dcbeff", "#9A6324", "#808000", "#aaffc3"];
+    
+  const [tfi, setTfi] = useState({ supply: 0, poolValue: 0 })
+  const [poolChart, setPoolChart] = useState([{ total: 0, marginChange: 0, blockNumber: 0 }])
+  const [curveChart, setCurveChart] = useState([{ total: 0, marginChange: 0, blockNumber: 0 }])
+  const [combinedChart, setCombinedChart] = useState([])
   const [loanTokenNameSet, setLoanTokenNameSet] = useState(new Set())
 
   useEffect(() => {
     getTfiTotalSupply().then(res => setTfi(prev => {
-      return {...prev, supply: res}
+      return { ...prev, supply: res }
     }))
     getPoolValue().then(res => setTfi(prev => {
-      return {...prev, poolValue: res}
+      return { ...prev, poolValue: res }
     }))
     getPoolChart().then(res => setPoolChart(res))
     getNetCurve().then(res => setCurveChart(res))
-    loanTokenBal().then((res) => {       
+    loanTokenBal().then((res: any) => {
       setCombinedChart(res.data)
       setLoanTokenNameSet(res.loanTokenNameSet)
-      console.log(res.loanTokenNameSet)
-      console.log(res.data)
+      // console.log(res.loanTokenNameSet)
+      // console.log("final", res.data)
     })
 
-    
+
   }, []);
 
-  return(
+  return (
     <div>
       <Row gutter={16}>
         <Col span={12}>
@@ -44,12 +47,12 @@ export const PoolPageOld: React.FC = () => {
         </Col>
         <Col span={12}>
           <Card>
-            <Statistic title="TFI-LP Total Supply" value={tfi.supply} precision={2}/>
+            <Statistic title="TFI-LP Total Supply" value={tfi.supply} precision={2} />
           </Card>
         </Col>
-      </Row>  
+      </Row>
       <Title level={2}>Pool Value Chart</Title>
-      <ComposedChart width={1200} height={500} data={poolChart} margin={{top: 30, right: 30, bottom: 30, left: 30,}}>
+      <ComposedChart width={1200} height={500} data={poolChart} margin={{ top: 30, right: 30, bottom: 30, left: 30, }}>
         <CartesianGrid stroke="#f5f5f5" />
         <XAxis dataKey="blockNumber" />
         <YAxis />
@@ -61,25 +64,32 @@ export const PoolPageOld: React.FC = () => {
 
       <Title level={2}>Pool Composition Chart</Title>
       <AreaChart width={1200} height={500} data={combinedChart}
-        margin={{top: 30, right: 30, left: 30, bottom: 30,}}>
+        margin={{ top: 30, right: 30, left: 30, bottom: 30, }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis 
-          tick={<CustomTick />}
-          dataKey="timestamp" 
-         />
+        <XAxis
+          // tick={<CustomTick />}
+          dataKey="blockNumber"
+        />
         <YAxis type="number" tickMargin={10} />
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip />
         <Legend />
-        {Array.from(loanTokenNameSet).map(data => {
+
+        {Array.from(loanTokenNameSet).map((data: any, index) => {
+          if (!isNaN(data)) {
+            data = "Loan" + data
+          }
+
           return (
-            <Area type="monotone" dataKey={`Loan${data}`} stackId="1" stroke="#8884d8" fill="#8884d8" />
+            <Area type="monotone"
+              dataKey={data}
+              stackId="1" stroke={colors[index]} fill={colors[index]} />
           )
         })}
       </AreaChart>
 
-      
+
       <Title level={2}>Pool Interaction with Curve.fi</Title>
-      <LineChart width={1000} height={300} data={curveChart} margin={{top: 30, right: 30, left: 30, bottom: 30,}}>
+      <LineChart width={1000} height={300} data={curveChart} margin={{ top: 30, right: 30, left: 30, bottom: 30, }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="blockNumber" />
         <YAxis type="number" tickMargin={10} />
