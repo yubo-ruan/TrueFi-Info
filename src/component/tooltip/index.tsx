@@ -26,7 +26,7 @@ const CustomTooltip = (props: TooltipProps) => {
             {payload && payload.length > 0 && payload.map((item: any, index: number) => {
                 return <Text color={item.color} key={`tooltip_${index}`}>
                     {item.name}: {(item.name === "total" || item.name === "marginChange") && "$"}
-                    {Number(item.value).toLocaleString()}
+                    {item.value === "-0" ? 0 : Number(item.value).toLocaleString()}
                 </Text>
             })
             }
