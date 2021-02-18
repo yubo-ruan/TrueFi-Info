@@ -6,7 +6,7 @@ import { Store } from "../../reducers";
 import { fetchPoolCompositionChartData } from "../../actions/pool/compositionChart.action";
 import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typography } from 'antd';
-import { GraphLoader, CustomTooltip } from "../../component";
+import { GraphLoader, CustomTooltip, CustomXaxisTick, CustomYaxisTick } from "../../component";
 import { isLoading } from "../../helpers/store";
 
 const { Title } = Typography;
@@ -37,10 +37,10 @@ const CompositionChart = () => {
             <Title level={2}>Pool Composition Chart</Title>
             {isLoading(status) && <GraphLoader top={"40%"} left={"50%"} />}
             <AreaChart width={1200} height={500} data={data.length > 0 ? data : initialData}
-                margin={{ top: 30, right: 30, left: 30, bottom: 30, }}>
+                margin={{ top: 30, right: 30, left: 60, bottom: 30, }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="blockNumber" />
-                <YAxis type="number" tickMargin={10} />
+                <XAxis dataKey="timestamp" tick={<CustomXaxisTick />}  />
+                <YAxis type="number" tickMargin={6} tick={<CustomYaxisTick />} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 {loanTokenSet.map((data: string | number, index: number) => {

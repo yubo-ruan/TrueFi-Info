@@ -6,7 +6,7 @@ import { Store } from "../../reducers";
 import { fetchPoolValueChartData } from "../../actions/pool/valueChart.action";
 import { Area, ComposedChart, XAxis, YAxis, Bar, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typography} from 'antd';
-import { GraphLoader, CustomTooltip } from "../../component";
+import { GraphLoader, CustomTooltip, CustomXaxisTick, CustomYaxisTick } from "../../component";
 import { isLoading } from "../../helpers/store"; 
 
 const { Title } = Typography;
@@ -36,10 +36,10 @@ const ValueChart = () => {
                 width={1200} 
                 height={500} 
                 data={data.length > 0 ? data : initialData} 
-                margin={{top: 30, right: 30, bottom: 30, left: 30,}}>
+                margin={{top: 30, right: 30, bottom: 30, left: 60,}}>
                     <CartesianGrid stroke="#f5f5f5" />
-                    <XAxis dataKey="blockNumber" />
-                    <YAxis />
+                    <XAxis dataKey="timestamp" tick={<CustomXaxisTick />}  />
+                    <YAxis type="number" tickMargin={6} tick={<CustomYaxisTick />}/>
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
                     <Area type="monotone" dataKey="total" fill="#ffc658" stroke="#8884d8" />
